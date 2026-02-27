@@ -14,7 +14,7 @@ $t_action = gpc_get_string( 'action', '' );
 
 if( $t_action === 'seed' ) {
     // Load seed data
-    require_once( plugin_file_path( 'seed_data.php', 'ProcessEngine' ) );
+    require_once( dirname( __DIR__ ) . '/db/seed_data.php' );
     $t_loaded = process_seed_load();
 
     form_security_purge( 'ProcessEngine_config_update' );

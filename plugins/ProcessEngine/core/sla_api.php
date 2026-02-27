@@ -170,8 +170,8 @@ function sla_next_working_day_start( $p_time, $p_bh_start, $p_working_days ) {
  * Updates statuses, sends notifications, triggers escalations.
  */
 function sla_run_check() {
-    require_once( plugin_file_path( 'notification_api.php', 'ProcessEngine' ) );
-    require_once( plugin_file_path( 'escalation_api.php', 'ProcessEngine' ) );
+    require_once( __DIR__ . '/notification_api.php' );
+    require_once( __DIR__ . '/escalation_api.php' );
 
     $t_table = plugin_table( 'sla_tracking' );
     $t_step_table = plugin_table( 'step' );

@@ -77,7 +77,7 @@ class ProcessEnginePlugin extends MantisPlugin {
             array( plugin_table( 'flow_definition' ), "
                 id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
                 name            C(128)  NOTNULL DEFAULT '',
-                description     XL      DEFAULT '',
+                description     XL,
                 status          I2      NOTNULL DEFAULT '0',
                 project_id      I       NOTNULL UNSIGNED DEFAULT '0',
                 created_by      I       NOTNULL UNSIGNED DEFAULT '0',
@@ -127,7 +127,7 @@ class ProcessEnginePlugin extends MantisPlugin {
                 from_status     I2      NOTNULL DEFAULT '0',
                 to_status       I2      NOTNULL DEFAULT '0',
                 user_id         I       NOTNULL UNSIGNED DEFAULT '0',
-                note            XL      DEFAULT '',
+                note            XL,
                 created_at      I       NOTNULL UNSIGNED DEFAULT '0'
             " )
         );
@@ -182,7 +182,7 @@ class ProcessEnginePlugin extends MantisPlugin {
      * Plugin install - run seed data
      */
     public function install() {
-        $t_seed_file = plugin_file_path( 'seed_data.php', 'ProcessEngine' );
+        $t_seed_file = __DIR__ . '/db/seed_data.php';
         // Seed data will be loaded separately via the seed page
         return true;
     }
@@ -191,7 +191,7 @@ class ProcessEnginePlugin extends MantisPlugin {
      * Hook: EVENT_UPDATE_BUG - log status changes and trigger SLA tracking
      */
     public function on_bug_update( $p_event, $p_bug_data, $p_bug_id ) {
-        require_once( plugin_file_path( 'process_api.php', 'ProcessEngine' ) );
+        require_once( __DIR__ . '/core/process_api.php' );
 
         $t_old_bug = bug_get( $p_bug_id );
         $t_new_status = $p_bug_data->status;
@@ -201,7 +201,7 @@ class ProcessEnginePlugin extends MantisPlugin {
             process_log_status_change( $p_bug_id, $t_old_status, $t_new_status );
 
             // SLA tracking: complete old step, start new step
-            require_once( plugin_file_path( 'sla_api.php', 'ProcessEngine' ) );
+            require_once( __DIR__ . '/core/sla_api.php' );
             $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
             $t_flow = process_get_active_flow_for_project( $t_project_id );
             if( $t_flow !== null ) {
@@ -260,7 +260,7 @@ class ProcessEnginePlugin extends MantisPlugin {
             return;
         }
 
-        require_once( plugin_file_path( 'process_api.php', 'ProcessEngine' ) );
+        require_once( __DIR__ . '/core/process_api.php' );
 
         $t_logs = process_get_logs_for_bug( $p_bug_id );
         if( empty( $t_logs ) ) {

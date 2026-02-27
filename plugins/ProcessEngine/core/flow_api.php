@@ -155,10 +155,12 @@ function flow_add_step( $p_flow_id, $p_data ) {
         )
     );
 
-    // Touch flow updated_at
+    // Önce ID'yi al, sonra timestamp güncelle
+    // (flow_touch UPDATE çalıştırır ve MySQL last_insert_id'yi sıfırlar)
+    $t_id = db_insert_id( $t_table );
     flow_touch( $p_flow_id );
 
-    return db_insert_id( $t_table );
+    return $t_id;
 }
 
 /**
@@ -254,8 +256,10 @@ function flow_add_transition( $p_flow_id, $p_from_step_id, $p_to_step_id, $p_con
             $p_condition_value,
         )
     );
+    // Önce ID'yi al, sonra timestamp güncelle
+    $t_id = db_insert_id( $t_table );
     flow_touch( $p_flow_id );
-    return db_insert_id( $t_table );
+    return $t_id;
 }
 
 /**

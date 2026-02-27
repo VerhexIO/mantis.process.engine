@@ -9,7 +9,7 @@
 auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
-require_once( plugin_file_path( 'flow_api.php', 'ProcessEngine' ) );
+require_once( dirname( __DIR__ ) . '/core/flow_api.php' );
 
 $t_flow_id = gpc_get_int( 'flow_id', 0 );
 $t_action = gpc_get_string( 'action', 'list' );

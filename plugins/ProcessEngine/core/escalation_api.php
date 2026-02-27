@@ -16,7 +16,7 @@
  * @param int $p_level Escalation level (1 or 2)
  */
 function escalation_trigger( $p_bug_id, $p_step_name, $p_level ) {
-    require_once( plugin_file_path( 'notification_api.php', 'ProcessEngine' ) );
+    require_once( __DIR__ . '/notification_api.php' );
 
     $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
 

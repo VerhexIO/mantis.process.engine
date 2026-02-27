@@ -133,7 +133,7 @@ function process_get_current_step_for_bug( $p_bug_id ) {
         FROM $t_log_table l
         LEFT JOIN $t_step_table s ON l.step_id = s.id
         WHERE l.bug_id = " . db_param() . "
-        ORDER BY l.created_at DESC
+        ORDER BY l.created_at DESC, l.id DESC
         LIMIT 1";
     $t_result = db_query( $t_query, array( (int) $p_bug_id ) );
     $t_row = db_fetch_array( $t_result );

@@ -8,7 +8,7 @@
 auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
-require_once( plugin_file_path( 'process_api.php', 'ProcessEngine' ) );
+require_once( dirname( __DIR__ ) . '/core/process_api.php' );
 
 layout_page_header( plugin_lang_get( 'dashboard_title' ) );
 layout_page_begin();

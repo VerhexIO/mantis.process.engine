@@ -8,7 +8,7 @@
 auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
-require_once( plugin_file_path( 'sla_api.php', 'ProcessEngine' ) );
+require_once( dirname( __DIR__ ) . '/core/sla_api.php' );
 
 // Handle manual SLA check trigger
 $t_action = gpc_get_string( 'action', '' );
