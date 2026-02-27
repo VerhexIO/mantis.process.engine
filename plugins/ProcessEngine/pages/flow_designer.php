@@ -258,15 +258,15 @@ if( $t_flow_id === 0 ) {
     </div>
 </div>
 
-<!-- Pass data to JS -->
-<script>
-var PE_FLOW_ID = <?php echo (int) $t_flow_id; ?>;
-var PE_SAVE_URL = '<?php echo plugin_page( 'flow_save' ); ?>';
-var PE_VALIDATE_URL = '<?php echo plugin_page( 'flow_validate' ); ?>';
-var PE_PUBLISH_URL = '<?php echo plugin_page( 'flow_publish' ); ?>';
-var PE_STEPS = <?php echo json_encode( $t_steps ); ?>;
-var PE_TRANSITIONS = <?php echo json_encode( $t_transitions ); ?>;
-</script>
+<!-- Pass data to JS via data attributes (CSP-safe, no inline script) -->
+<div id="pe-config"
+     data-flow-id="<?php echo (int) $t_flow_id; ?>"
+     data-save-url="<?php echo string_attribute( plugin_page( 'flow_save' ) ); ?>"
+     data-validate-url="<?php echo string_attribute( plugin_page( 'flow_validate' ) ); ?>"
+     data-publish-url="<?php echo string_attribute( plugin_page( 'flow_publish' ) ); ?>"
+     data-steps="<?php echo string_attribute( json_encode( $t_steps ) ); ?>"
+     data-transitions="<?php echo string_attribute( json_encode( $t_transitions ) ); ?>"
+     style="display:none;"></div>
 <link rel="stylesheet" href="<?php echo plugin_file( 'flow_designer.css' ); ?>" />
 <script src="<?php echo plugin_file( 'flow_designer.js' ); ?>"></script>
 

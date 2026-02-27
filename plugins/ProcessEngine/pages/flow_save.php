@@ -5,7 +5,8 @@
  * Accepts JSON POST with flow data and saves to database.
  */
 
-auth_reauthenticate();
+// AJAX endpoint: auth_ensure ile kontrol (auth_reauthenticate HTML form döndürür)
+auth_ensure_user_authenticated();
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 require_once( dirname( __DIR__ ) . '/core/flow_api.php' );

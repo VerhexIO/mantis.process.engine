@@ -23,15 +23,36 @@
     var dragState = null; // { nodeId, offsetX, offsetY }
     var connectState = null; // { fromId } - drawing a transition
 
+    // Config (read from data attributes, CSP-safe)
+    var PE_FLOW_ID = 0;
+    var PE_SAVE_URL = '';
+    var PE_VALIDATE_URL = '';
+    var PE_PUBLISH_URL = '';
+
     // ---- Init ----
     function init() {
         canvas = document.getElementById('pe-canvas');
         wrapper = document.getElementById('pe-canvas-wrapper');
         if (!canvas) return;
 
-        // Load server data
-        steps = (typeof PE_STEPS !== 'undefined') ? PE_STEPS.map(normalizeStep) : [];
-        transitions = (typeof PE_TRANSITIONS !== 'undefined') ? PE_TRANSITIONS.map(normalizeTransition) : [];
+        // Load config from data attributes (CSP-safe, no inline script)
+        var configEl = document.getElementById('pe-config');
+        if (configEl) {
+            PE_FLOW_ID = parseInt(configEl.getAttribute('data-flow-id')) || 0;
+            PE_SAVE_URL = configEl.getAttribute('data-save-url') || '';
+            PE_VALIDATE_URL = configEl.getAttribute('data-validate-url') || '';
+            PE_PUBLISH_URL = configEl.getAttribute('data-publish-url') || '';
+
+            try {
+                var stepsData = JSON.parse(configEl.getAttribute('data-steps') || '[]');
+                steps = stepsData.map(normalizeStep);
+            } catch (e) { steps = []; }
+
+            try {
+                var transData = JSON.parse(configEl.getAttribute('data-transitions') || '[]');
+                transitions = transData.map(normalizeTransition);
+            } catch (e) { transitions = []; }
+        }
 
         render();
         bindToolbar();
