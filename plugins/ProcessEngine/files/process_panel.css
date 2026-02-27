@@ -1,0 +1,65 @@
+/* ProcessEngine - Dashboard & Process Panel Styles */
+
+/* Summary Cards */
+.pe-card {
+    text-align: center;
+    padding: 15px 10px;
+    min-height: 90px;
+}
+.pe-card-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.2;
+}
+.pe-card-label {
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+.pe-card-blue .pe-card-value { color: #3498db; }
+.pe-card-red .pe-card-value { color: #e74c3c; }
+.pe-card-green .pe-card-value { color: #27ae60; }
+.pe-card-orange .pe-card-value { color: #f39c12; }
+.pe-card-purple .pe-card-value { color: #9b59b6; }
+
+/* SLA Status Badges */
+.pe-sla-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+}
+.pe-sla-normal {
+    background-color: #27ae60;
+}
+.pe-sla-warning {
+    background-color: #f39c12;
+}
+.pe-sla-exceeded {
+    background-color: #e74c3c;
+}
+
+/* Process Timeline (issue detail) */
+.process-timeline {
+    padding: 10px;
+}
+.process-timeline table {
+    margin-bottom: 0;
+}
+.process-status {
+    font-weight: 600;
+}
+
+/* Filter buttons */
+.widget-toolbox .btn-group .btn {
+    margin-right: 4px;
+}
+
+/* Responsive table fix */
+.table-responsive {
+    overflow-x: auto;
+}

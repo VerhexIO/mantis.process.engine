@@ -1,0 +1,126 @@
+<?php
+/** Turkish strings for ProcessEngine plugin */
+
+$s_plugin_ProcessEngine_plugin_title = 'Süreç Motoru';
+$s_plugin_ProcessEngine_plugin_description = 'MantisBT için departmanlar arası iş akışı yönetim motoru. Fiyat talebi, ürün geliştirme gibi süreçleri otomatize eder.';
+
+# Menu
+$s_plugin_ProcessEngine_menu_dashboard = 'Süreç Paneli';
+$s_plugin_ProcessEngine_menu_config = 'Süreç Motoru Ayarları';
+$s_plugin_ProcessEngine_menu_flow_designer = 'Akış Tasarımcısı';
+
+# Dashboard
+$s_plugin_ProcessEngine_dashboard_title = 'Süreç Paneli';
+$s_plugin_ProcessEngine_total_requests = 'Toplam Talep';
+$s_plugin_ProcessEngine_active_processes = 'Aktif Süreçler';
+$s_plugin_ProcessEngine_sla_exceeded = 'SLA Aşımı';
+$s_plugin_ProcessEngine_avg_resolution_time = 'Ort. Çözüm Süresi';
+$s_plugin_ProcessEngine_updated_today = 'Bugün Güncellenen';
+$s_plugin_ProcessEngine_pending_approvals = 'Bekleyen Onaylar';
+
+# Filters
+$s_plugin_ProcessEngine_filter_all = 'Tümü';
+$s_plugin_ProcessEngine_filter_active = 'Aktif';
+$s_plugin_ProcessEngine_filter_sla_exceeded = 'SLA Aşımı';
+$s_plugin_ProcessEngine_filter_completed = 'Tamamlanan';
+
+# Table columns
+$s_plugin_ProcessEngine_col_bug_id = 'Talep No';
+$s_plugin_ProcessEngine_col_summary = 'Başlık';
+$s_plugin_ProcessEngine_col_current_step = 'Mevcut Adım';
+$s_plugin_ProcessEngine_col_department = 'Departman';
+$s_plugin_ProcessEngine_col_sla_status = 'SLA Durumu';
+$s_plugin_ProcessEngine_col_updated = 'Güncelleme';
+$s_plugin_ProcessEngine_col_date = 'Tarih';
+$s_plugin_ProcessEngine_col_from_status = 'Önceki Durum';
+$s_plugin_ProcessEngine_col_to_status = 'Yeni Durum';
+$s_plugin_ProcessEngine_col_user = 'Kullanıcı';
+$s_plugin_ProcessEngine_col_step = 'Adım';
+$s_plugin_ProcessEngine_col_note = 'Not';
+$s_plugin_ProcessEngine_col_flow_name = 'Akış Adı';
+$s_plugin_ProcessEngine_col_status = 'Durum';
+$s_plugin_ProcessEngine_col_actions = 'İşlemler';
+
+# Process timeline
+$s_plugin_ProcessEngine_process_timeline = 'Süreç Zaman Çizelgesi';
+$s_plugin_ProcessEngine_no_process_data = 'Bu talep için süreç verisi bulunmamaktadır.';
+
+# Flow Designer
+$s_plugin_ProcessEngine_flow_designer_title = 'Akış Tasarımcısı';
+$s_plugin_ProcessEngine_flow_list_title = 'Akış Listesi';
+$s_plugin_ProcessEngine_new_flow = 'Yeni Akış';
+$s_plugin_ProcessEngine_flow_name = 'Akış Adı';
+$s_plugin_ProcessEngine_flow_description = 'Açıklama';
+$s_plugin_ProcessEngine_flow_status_draft = 'Taslak';
+$s_plugin_ProcessEngine_flow_status_pending = 'Onay Bekliyor';
+$s_plugin_ProcessEngine_flow_status_active = 'Aktif';
+$s_plugin_ProcessEngine_btn_save = 'Kaydet';
+$s_plugin_ProcessEngine_btn_validate = 'Doğrula';
+$s_plugin_ProcessEngine_btn_publish = 'Yayınla';
+$s_plugin_ProcessEngine_btn_add_step = 'Adım Ekle';
+$s_plugin_ProcessEngine_btn_delete = 'Sil';
+$s_plugin_ProcessEngine_btn_edit = 'Düzenle';
+$s_plugin_ProcessEngine_btn_back = 'Geri';
+
+# Step properties
+$s_plugin_ProcessEngine_step_name = 'Adım Adı';
+$s_plugin_ProcessEngine_step_department = 'Departman';
+$s_plugin_ProcessEngine_step_sla_hours = 'SLA (Saat)';
+$s_plugin_ProcessEngine_step_role = 'Rol';
+$s_plugin_ProcessEngine_step_mantis_status = 'MantisBT Durumu';
+
+# Departments
+$s_plugin_ProcessEngine_dept_sales = 'Satış';
+$s_plugin_ProcessEngine_dept_pricing = 'Fiyatlandırma';
+$s_plugin_ProcessEngine_dept_sales_ops = 'Satış Operasyon';
+$s_plugin_ProcessEngine_dept_procurement = 'Satınalma';
+$s_plugin_ProcessEngine_dept_rnd = 'ArGe';
+$s_plugin_ProcessEngine_dept_management = 'Yönetim';
+$s_plugin_ProcessEngine_dept_quality = 'Kalite';
+
+# Validation messages
+$s_plugin_ProcessEngine_validation_success = 'Akış doğrulaması başarılı.';
+$s_plugin_ProcessEngine_validation_no_start = 'Akışta bir başlangıç düğümü olmalıdır.';
+$s_plugin_ProcessEngine_validation_no_end = 'Akışta en az bir bitiş düğümü olmalıdır.';
+$s_plugin_ProcessEngine_validation_cycle = 'Akışta döngü tespit edildi.';
+$s_plugin_ProcessEngine_validation_unreachable = 'Bazı düğümlere başlangıçtan ulaşılamıyor.';
+$s_plugin_ProcessEngine_validation_multiple_start = 'Birden fazla başlangıç düğümü olamaz.';
+
+# SLA
+$s_plugin_ProcessEngine_sla_normal = 'Normal';
+$s_plugin_ProcessEngine_sla_warning = 'Uyarı';
+$s_plugin_ProcessEngine_sla_exceeded = 'Aşım';
+$s_plugin_ProcessEngine_sla_check = 'SLA Kontrol';
+$s_plugin_ProcessEngine_sla_dashboard = 'SLA Durumu';
+$s_plugin_ProcessEngine_bottlenecks = 'Darboğazları Göster';
+
+# Escalation
+$s_plugin_ProcessEngine_escalation_warning_subject = '[MantisBT] SLA Uyarısı - Talep #%d';
+$s_plugin_ProcessEngine_escalation_warning_body = 'Talep #%1$d için "%2$s" adımında SLA süresinin %%80\'i dolmuştur. Kalan süre: %3$s saat.';
+$s_plugin_ProcessEngine_escalation_exceeded_subject = '[MantisBT] SLA Aşımı - Talep #%d';
+$s_plugin_ProcessEngine_escalation_exceeded_body = 'Talep #%1$d için "%2$s" adımında SLA süresi aşılmıştır. Aşım süresi: %3$s saat.';
+$s_plugin_ProcessEngine_escalation_level1_subject = '[MantisBT] Eskalasyon Seviye 1 - Talep #%d';
+$s_plugin_ProcessEngine_escalation_level1_body = 'Talep #%1$d için "%2$s" adımında SLA süresinin 1.5 katı aşılmıştır. Yönetici müdahalesi gereklidir.';
+$s_plugin_ProcessEngine_escalation_level2_subject = '[MantisBT] Eskalasyon Seviye 2 - Talep #%d';
+$s_plugin_ProcessEngine_escalation_level2_body = 'Talep #%1$d için "%2$s" adımında SLA süresinin 2 katı aşılmıştır. Acil müdahale gereklidir.';
+
+# Config page
+$s_plugin_ProcessEngine_config_title = 'Süreç Motoru Yapılandırması';
+$s_plugin_ProcessEngine_config_manage_threshold = 'Yönetim Erişim Seviyesi';
+$s_plugin_ProcessEngine_config_view_threshold = 'Görüntüleme Erişim Seviyesi';
+$s_plugin_ProcessEngine_config_sla_warning_percent = 'SLA Uyarı Yüzdesi';
+$s_plugin_ProcessEngine_config_business_hours_start = 'İş Saati Başlangıç';
+$s_plugin_ProcessEngine_config_business_hours_end = 'İş Saati Bitiş';
+$s_plugin_ProcessEngine_config_working_days = 'Çalışma Günleri';
+$s_plugin_ProcessEngine_config_saved = 'Yapılandırma kaydedildi.';
+$s_plugin_ProcessEngine_config_working_days_help = 'Virgülle ayrılmış gün numaraları (1=Pazartesi, 7=Pazar)';
+
+# Misc
+$s_plugin_ProcessEngine_hours = 'saat';
+$s_plugin_ProcessEngine_days = 'gün';
+$s_plugin_ProcessEngine_no_data = 'Veri bulunamadı.';
+$s_plugin_ProcessEngine_confirm_delete = 'Silmek istediğinizden emin misiniz?';
+$s_plugin_ProcessEngine_published_success = 'Akış başarıyla yayınlandı.';
+$s_plugin_ProcessEngine_save_success = 'Kaydedildi.';
+$s_plugin_ProcessEngine_seed_data = 'Örnek Veri Yükle';
+$s_plugin_ProcessEngine_seed_success = 'Örnek veriler başarıyla yüklendi.';

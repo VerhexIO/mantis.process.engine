@@ -1,0 +1,23 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker
+docker/mantis-data/
+
+# Claude
+.claude/
+
+# Logs
+*.log
+
+# Dependencies (MantisBT core is in Docker, not in repo)
+vendor/
+node_modules/
