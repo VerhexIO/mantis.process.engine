@@ -335,7 +335,7 @@ class ProcessEnginePlugin extends MantisPlugin {
                     <?php foreach( $t_logs as $t_log ) { ?>
                     <tr>
                         <td><?php echo date( 'Y-m-d H:i', $t_log['created_at'] ); ?></td>
-                        <td><span class="process-status"><?php echo get_enum_element( 'status', $t_log['from_status'] ); ?></span></td>
+                        <td><span class="process-status"><?php echo (int)$t_log['from_status'] === 0 ? '-' : get_enum_element( 'status', $t_log['from_status'] ); ?></span></td>
                         <td><span class="process-status"><?php echo get_enum_element( 'status', $t_log['to_status'] ); ?></span></td>
                         <td><?php echo user_get_name( $t_log['user_id'] ); ?></td>
                         <td><?php echo string_display_line( $t_log['step_name'] ); ?></td>
