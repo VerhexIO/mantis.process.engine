@@ -141,6 +141,78 @@ function process_get_current_step_for_bug( $p_bug_id ) {
 }
 
 /**
+ * Find the start step of a flow (step with no incoming transitions).
+ *
+ * @param int $p_flow_id Flow ID
+ * @return array|null Step row or null
+ */
+function process_find_start_step( $p_flow_id ) {
+    $t_step_table = plugin_table( 'step' );
+    $t_trans_table = plugin_table( 'transition' );
+    db_param_push();
+    $t_query = "SELECT s.* FROM $t_step_table s
+        WHERE s.flow_id = " . db_param() . "
+        AND s.id NOT IN (SELECT to_step_id FROM $t_trans_table WHERE flow_id = " . db_param() . ")
+        ORDER BY s.step_order ASC LIMIT 1";
+    $t_result = db_query( $t_query, array( (int) $p_flow_id, (int) $p_flow_id ) );
+    $t_row = db_fetch_array( $t_result );
+    return ( $t_row !== false ) ? $t_row : null;
+}
+
+/**
+ * Log initial process entry when a bug is created.
+ *
+ * @param int $p_bug_id Bug ID
+ * @param int $p_flow_id Flow ID
+ * @param array $p_step Start step data
+ */
+function process_log_initial( $p_bug_id, $p_flow_id, $p_step ) {
+    $t_log_table = plugin_table( 'log' );
+    db_param_push();
+    $t_query = "INSERT INTO $t_log_table
+        ( bug_id, flow_id, step_id, from_status, to_status, user_id, note, created_at )
+        VALUES ( " . db_param() . ", " . db_param() . ", " . db_param() . ", "
+        . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . " )";
+    db_query( $t_query, array(
+        (int) $p_bug_id,
+        (int) $p_flow_id,
+        (int) $p_step['id'],
+        0,
+        (int) $p_step['mantis_status'],
+        (int) auth_get_current_user_id(),
+        plugin_lang_get( 'process_started' ),
+        time(),
+    ) );
+}
+
+/**
+ * Check if a transition exists between two steps (by MantisBT status values).
+ *
+ * @param int $p_flow_id Flow ID
+ * @param int $p_from_status MantisBT from status
+ * @param int $p_to_status MantisBT to status
+ * @return bool True if transition exists
+ */
+function process_transition_exists( $p_flow_id, $p_from_status, $p_to_status ) {
+    $t_step_table = plugin_table( 'step' );
+    $t_trans_table = plugin_table( 'transition' );
+    db_param_push();
+    $t_query = "SELECT t.id FROM $t_trans_table t
+        INNER JOIN $t_step_table sf ON t.from_step_id = sf.id AND sf.flow_id = " . db_param() . "
+        INNER JOIN $t_step_table st ON t.to_step_id = st.id AND st.flow_id = " . db_param() . "
+        WHERE t.flow_id = " . db_param() . "
+        AND sf.mantis_status = " . db_param() . "
+        AND st.mantis_status = " . db_param() . "
+        LIMIT 1";
+    $t_result = db_query( $t_query, array(
+        (int) $p_flow_id, (int) $p_flow_id, (int) $p_flow_id,
+        (int) $p_from_status, (int) $p_to_status
+    ) );
+    $t_row = db_fetch_array( $t_result );
+    return ( $t_row !== false );
+}
+
+/**
  * Get all unique bug IDs that have process log entries.
  *
  * @return array Array of bug IDs

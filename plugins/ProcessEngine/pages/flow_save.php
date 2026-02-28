@@ -30,7 +30,8 @@ if( $t_flow === null ) {
 
 // Update flow metadata
 if( isset( $t_input['name'] ) ) {
-    flow_update( $t_flow_id, $t_input['name'], isset( $t_input['description'] ) ? $t_input['description'] : '' );
+    $t_project_id = isset( $t_input['project_id'] ) ? (int) $t_input['project_id'] : 0;
+    flow_update( $t_flow_id, $t_input['name'], isset( $t_input['description'] ) ? $t_input['description'] : '', $t_project_id );
 }
 
 // Save steps and transitions

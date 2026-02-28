@@ -57,6 +57,7 @@ class ProcessEnginePlugin extends MantisPlugin {
      */
     public function hooks() {
         return array(
+            'EVENT_REPORT_BUG'        => 'on_bug_report',
             'EVENT_UPDATE_BUG'        => 'on_bug_update',
             'EVENT_MENU_MAIN'         => 'on_menu_main',
             'EVENT_LAYOUT_RESOURCES'  => 'on_layout_resources',
@@ -188,6 +189,36 @@ class ProcessEnginePlugin extends MantisPlugin {
     }
 
     /**
+     * Hook: EVENT_REPORT_BUG - start process tracking when a bug is created
+     */
+    public function on_bug_report( $p_event, $p_bug_data, $p_bug_id ) {
+        require_once( __DIR__ . '/core/process_api.php' );
+        require_once( __DIR__ . '/core/sla_api.php' );
+
+        $t_project_id = $p_bug_data->project_id;
+        $t_flow = process_get_active_flow_for_project( $t_project_id );
+        if( $t_flow === null ) {
+            return $p_bug_data;
+        }
+
+        // İlk adımı bul (gelen geçişi olmayan adım)
+        $t_step = process_find_start_step( $t_flow['id'] );
+        if( $t_step === null ) {
+            return $p_bug_data;
+        }
+
+        // Süreç loguna başlangıç kaydı yaz
+        process_log_initial( $p_bug_id, $t_flow['id'], $t_step );
+
+        // SLA takibini başlat
+        if( (int) $t_step['sla_hours'] > 0 ) {
+            sla_start_tracking( $p_bug_id, (int) $t_step['id'], (int) $t_flow['id'], (int) $t_step['sla_hours'] );
+        }
+
+        return $p_bug_data;
+    }
+
+    /**
      * Hook: EVENT_UPDATE_BUG - log status changes and trigger SLA tracking
      */
     public function on_bug_update( $p_event, $p_bug_data, $p_bug_id ) {
@@ -198,12 +229,18 @@ class ProcessEnginePlugin extends MantisPlugin {
         $t_old_status = $t_old_bug->status;
 
         if( $t_old_status != $t_new_status ) {
-            process_log_status_change( $p_bug_id, $t_old_status, $t_new_status );
+            // Akış dışı geçiş kontrolü
+            $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
+            $t_flow = process_get_active_flow_for_project( $t_project_id );
+            $t_note = '';
+            if( $t_flow !== null && !process_transition_exists( $t_flow['id'], $t_old_status, $t_new_status ) ) {
+                $t_note = plugin_lang_get( 'out_of_flow_transition' );
+            }
+
+            process_log_status_change( $p_bug_id, $t_old_status, $t_new_status, $t_note );
 
             // SLA tracking: complete old step, start new step
             require_once( __DIR__ . '/core/sla_api.php' );
-            $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
-            $t_flow = process_get_active_flow_for_project( $t_project_id );
             if( $t_flow !== null ) {
                 sla_complete_tracking( $p_bug_id );
                 $t_step = process_find_step_by_status( $t_flow['id'], $t_new_status );

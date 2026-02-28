@@ -57,6 +57,7 @@ if( $t_flow_id === 0 ) {
                             <tr>
                                 <th>ID</th>
                                 <th><?php echo plugin_lang_get( 'col_flow_name' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'flow_project' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_status' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_updated' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_actions' ); ?></th>
@@ -64,7 +65,7 @@ if( $t_flow_id === 0 ) {
                         </thead>
                         <tbody>
                             <?php if( empty( $t_flows ) ) { ?>
-                            <tr><td colspan="5" class="center"><?php echo plugin_lang_get( 'no_data' ); ?></td></tr>
+                            <tr><td colspan="6" class="center"><?php echo plugin_lang_get( 'no_data' ); ?></td></tr>
                             <?php } else {
                                 foreach( $t_flows as $t_flow ) {
                                     $t_status_labels = array(
@@ -87,6 +88,14 @@ if( $t_flow_id === 0 ) {
                                         <?php echo string_display_line( $t_flow['name'] ); ?>
                                     </a>
                                 </td>
+                                <td><?php
+                                    $t_proj_id = (int) $t_flow['project_id'];
+                                    if( $t_proj_id > 0 && project_exists( $t_proj_id ) ) {
+                                        echo string_display_line( project_get_name( $t_proj_id ) );
+                                    } else {
+                                        echo plugin_lang_get( 'all_projects' );
+                                    }
+                                ?></td>
                                 <td><span class="label <?php echo $t_status_class; ?>"><?php echo $t_status_label; ?></span></td>
                                 <td><?php echo $t_flow['updated_at'] ? date( 'Y-m-d H:i', $t_flow['updated_at'] ) : '-'; ?></td>
                                 <td>
@@ -150,9 +159,23 @@ if( $t_flow_id === 0 ) {
                         <label><?php echo plugin_lang_get( 'flow_name' ); ?></label>
                         <input type="text" id="pe-flow-name" class="form-control input-sm" value="<?php echo string_attribute( $t_flow['name'] ); ?>" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label><?php echo plugin_lang_get( 'flow_description' ); ?></label>
                         <input type="text" id="pe-flow-desc" class="form-control input-sm" value="<?php echo string_attribute( $t_flow['description'] ); ?>" />
+                    </div>
+                    <div class="col-md-2">
+                        <label><?php echo plugin_lang_get( 'flow_project' ); ?></label>
+                        <select id="pe-flow-project" class="form-control input-sm">
+                            <option value="0"><?php echo plugin_lang_get( 'all_projects' ); ?></option>
+                            <?php
+                            $t_projects = project_get_all_rows();
+                            foreach( $t_projects as $t_proj ) { ?>
+                            <option value="<?php echo (int) $t_proj['id']; ?>"
+                                <?php echo ( (int) $t_flow['project_id'] === (int) $t_proj['id'] ) ? 'selected' : ''; ?>>
+                                <?php echo string_display_line( $t_proj['name'] ); ?>
+                            </option>
+                            <?php } ?>
+                        </select>
                     </div>
                     <div class="col-md-2" style="padding-top: 22px;">
                         <span class="label <?php
@@ -264,6 +287,7 @@ if( $t_flow_id === 0 ) {
      data-save-url="<?php echo string_attribute( plugin_page( 'flow_save' ) ); ?>"
      data-validate-url="<?php echo string_attribute( plugin_page( 'flow_validate' ) ); ?>"
      data-publish-url="<?php echo string_attribute( plugin_page( 'flow_publish' ) ); ?>"
+     data-project-id="<?php echo (int) $t_flow['project_id']; ?>"
      data-steps="<?php echo string_attribute( json_encode( $t_steps ) ); ?>"
      data-transitions="<?php echo string_attribute( json_encode( $t_transitions ) ); ?>"
      style="display:none;"></div>

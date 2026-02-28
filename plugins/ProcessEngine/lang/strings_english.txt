@@ -124,3 +124,9 @@ $s_plugin_ProcessEngine_published_success = 'Flow published successfully.';
 $s_plugin_ProcessEngine_save_success = 'Saved successfully.';
 $s_plugin_ProcessEngine_seed_data = 'Load Sample Data';
 $s_plugin_ProcessEngine_seed_success = 'Sample data loaded successfully.';
+
+# Project and process
+$s_plugin_ProcessEngine_flow_project = 'Project';
+$s_plugin_ProcessEngine_all_projects = 'All Projects';
+$s_plugin_ProcessEngine_process_started = 'Process started';
+$s_plugin_ProcessEngine_out_of_flow_transition = 'Out-of-flow transition';

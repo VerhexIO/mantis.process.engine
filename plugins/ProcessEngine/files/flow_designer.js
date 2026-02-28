@@ -22,6 +22,7 @@
     var selectedNodeId = null;
     var dragState = null; // { nodeId, offsetX, offsetY }
     var connectState = null; // { fromId } - drawing a transition
+    var isDirty = false;    // Unsaved changes flag
 
     // Config (read from data attributes, CSP-safe)
     var PE_FLOW_ID = 0;
@@ -58,6 +59,14 @@
         bindToolbar();
         bindCanvasEvents();
         bindModal();
+
+        // Kaydedilmemiş değişiklik uyarısı
+        window.addEventListener('beforeunload', function(e) {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
     }
 
     function normalizeStep(s) {
@@ -188,6 +197,7 @@
             e.stopPropagation();
             if (confirm('Bu bağlantıyı silmek istiyor musunuz?')) {
                 transitions = transitions.filter(function(t) { return t.id !== tr.id; });
+                isDirty = true;
                 render();
             }
         });
@@ -263,6 +273,7 @@
             if (step) {
                 step.position_x = Math.max(0, Math.round(pt.x - dragState.offsetX));
                 step.position_y = Math.max(0, Math.round(pt.y - dragState.offsetY));
+                isDirty = true;
                 render();
             }
         }
@@ -304,6 +315,7 @@
                             condition_field: '',
                             condition_value: ''
                         });
+                        isDirty = true;
                     }
                 }
             }
@@ -344,6 +356,7 @@
                     return t.from_step_id !== nodeId && t.to_step_id !== nodeId;
                 });
                 selectedNodeId = null;
+                isDirty = true;
                 render();
             }}
         ];
@@ -386,6 +399,7 @@
                     step.sla_hours = parseInt(document.getElementById('pe-modal-sla').value) || 0;
                     step.role = document.getElementById('pe-modal-role').value;
                     step.mantis_status = parseInt(document.getElementById('pe-modal-mantis-status').value) || 10;
+                    isDirty = true;
                     render();
                 }
                 $('#pe-step-modal').modal('hide');
@@ -399,6 +413,7 @@
                     return t.from_step_id !== id && t.to_step_id !== id;
                 });
                 selectedNodeId = null;
+                isDirty = true;
                 render();
                 $('#pe-step-modal').modal('hide');
             });
@@ -429,6 +444,7 @@
             steps.forEach(function(s) {
                 if (s.position_x >= maxX) maxX = s.position_x + NODE_W + 40;
             });
+            isDirty = true;
             steps.push({
                 id: id,
                 name: 'Yeni Adım',
@@ -456,10 +472,12 @@
     }
 
     function doSave() {
+        var projectEl = document.getElementById('pe-flow-project');
         var payload = {
             flow_id: PE_FLOW_ID,
             name: document.getElementById('pe-flow-name').value,
             description: document.getElementById('pe-flow-desc').value,
+            project_id: projectEl ? parseInt(projectEl.value) || 0 : 0,
             steps: steps.map(function(s) {
                 return {
                     temp_id: s.id,
@@ -489,6 +507,7 @@
                 steps = resp.steps.map(normalizeStep);
                 transitions = resp.transitions.map(normalizeTransition);
                 render();
+                isDirty = false;
                 showStatus('success', 'Kaydedildi!');
                 // Update flow name display
                 document.getElementById('pe-flow-name-display').textContent =
@@ -528,10 +547,12 @@
     }
 
     function doSaveSync(callback) {
+        var projectEl = document.getElementById('pe-flow-project');
         var payload = {
             flow_id: PE_FLOW_ID,
             name: document.getElementById('pe-flow-name').value,
             description: document.getElementById('pe-flow-desc').value,
+            project_id: projectEl ? parseInt(projectEl.value) || 0 : 0,
             steps: steps.map(function(s) {
                 return {
                     temp_id: s.id,
@@ -559,6 +580,7 @@
             if (resp.success) {
                 steps = resp.steps.map(normalizeStep);
                 transitions = resp.transitions.map(normalizeTransition);
+                isDirty = false;
                 render();
                 if (callback) callback();
             } else {

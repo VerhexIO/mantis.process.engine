@@ -124,3 +124,9 @@ $s_plugin_ProcessEngine_published_success = 'Akış başarıyla yayınlandı.';
 $s_plugin_ProcessEngine_save_success = 'Kaydedildi.';
 $s_plugin_ProcessEngine_seed_data = 'Örnek Veri Yükle';
 $s_plugin_ProcessEngine_seed_success = 'Örnek veriler başarıyla yüklendi.';
+
+# Proje ve süreç
+$s_plugin_ProcessEngine_flow_project = 'Proje';
+$s_plugin_ProcessEngine_all_projects = 'Tüm Projeler';
+$s_plugin_ProcessEngine_process_started = 'Süreç başlatıldı';
+$s_plugin_ProcessEngine_out_of_flow_transition = 'Akış dışı geçiş';

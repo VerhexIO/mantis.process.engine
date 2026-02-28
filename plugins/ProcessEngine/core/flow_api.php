@@ -73,20 +73,31 @@ function flow_create( $p_name, $p_description = '', $p_project_id = 0 ) {
 }
 
 /**
- * Update flow metadata (name, description).
+ * Update flow metadata (name, description, project_id).
  *
  * @param int $p_flow_id Flow ID
  * @param string $p_name New name
  * @param string $p_description New description
+ * @param int $p_project_id Project ID (0 for global)
  */
-function flow_update( $p_flow_id, $p_name, $p_description = '' ) {
+function flow_update( $p_flow_id, $p_name, $p_description = '', $p_project_id = -1 ) {
     $t_table = plugin_table( 'flow_definition' );
-    db_param_push();
-    db_query(
-        "UPDATE $t_table SET name = " . db_param() . ", description = " . db_param()
-        . ", updated_at = " . db_param() . " WHERE id = " . db_param(),
-        array( $p_name, $p_description, time(), (int) $p_flow_id )
-    );
+
+    if( $p_project_id >= 0 ) {
+        db_param_push();
+        db_query(
+            "UPDATE $t_table SET name = " . db_param() . ", description = " . db_param()
+            . ", project_id = " . db_param() . ", updated_at = " . db_param() . " WHERE id = " . db_param(),
+            array( $p_name, $p_description, (int) $p_project_id, time(), (int) $p_flow_id )
+        );
+    } else {
+        db_param_push();
+        db_query(
+            "UPDATE $t_table SET name = " . db_param() . ", description = " . db_param()
+            . ", updated_at = " . db_param() . " WHERE id = " . db_param(),
+            array( $p_name, $p_description, time(), (int) $p_flow_id )
+        );
+    }
 }
 
 /**
