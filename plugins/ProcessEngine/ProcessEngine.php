@@ -304,49 +304,48 @@ class ProcessEnginePlugin extends MantisPlugin {
             return;
         }
 
-        $t_collapse_block = is_page_name( 'bug_view_page' );
 ?>
-<tr class="spacer"><td colspan="6"></td></tr>
-<tr>
-    <td class="category" colspan="6">
+<div class="col-md-12 col-xs-12">
+    <div class="space-10"></div>
+    <div class="widget-box widget-color-blue2">
         <div class="widget-header widget-header-small">
-            <h4 class="widget-title">
-                <i class="fa fa-cogs"></i>
+            <h4 class="widget-title lighter">
+                <i class="ace-icon fa fa-cogs"></i>
                 <?php echo plugin_lang_get( 'process_timeline' ); ?>
             </h4>
         </div>
-    </td>
-</tr>
-<tr>
-    <td colspan="6">
-        <div class="process-timeline">
-            <table class="table table-bordered table-condensed table-striped">
-                <thead>
-                    <tr>
-                        <th><?php echo plugin_lang_get( 'col_date' ); ?></th>
-                        <th><?php echo plugin_lang_get( 'col_from_status' ); ?></th>
-                        <th><?php echo plugin_lang_get( 'col_to_status' ); ?></th>
-                        <th><?php echo plugin_lang_get( 'col_user' ); ?></th>
-                        <th><?php echo plugin_lang_get( 'col_step' ); ?></th>
-                        <th><?php echo plugin_lang_get( 'col_note' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach( $t_logs as $t_log ) { ?>
-                    <tr>
-                        <td><?php echo date( 'Y-m-d H:i', $t_log['created_at'] ); ?></td>
-                        <td><span class="process-status"><?php echo (int)$t_log['from_status'] === 0 ? '-' : get_enum_element( 'status', $t_log['from_status'] ); ?></span></td>
-                        <td><span class="process-status"><?php echo get_enum_element( 'status', $t_log['to_status'] ); ?></span></td>
-                        <td><?php echo user_get_name( $t_log['user_id'] ); ?></td>
-                        <td><?php echo string_display_line( $t_log['step_name'] ); ?></td>
-                        <td><?php echo string_display_line( $t_log['note'] ); ?></td>
-                    </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
+        <div class="widget-body">
+            <div class="widget-main no-padding">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-condensed table-striped">
+                        <thead>
+                            <tr>
+                                <th><?php echo plugin_lang_get( 'col_date' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_from_status' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_to_status' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_user' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_step' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_note' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach( $t_logs as $t_log ) { ?>
+                            <tr>
+                                <td><?php echo date( 'Y-m-d H:i', $t_log['created_at'] ); ?></td>
+                                <td><span class="process-status"><?php echo (int)$t_log['from_status'] === 0 ? '-' : get_enum_element( 'status', $t_log['from_status'] ); ?></span></td>
+                                <td><span class="process-status"><?php echo get_enum_element( 'status', $t_log['to_status'] ); ?></span></td>
+                                <td><?php echo user_get_name( $t_log['user_id'] ); ?></td>
+                                <td><?php echo string_display_line( $t_log['step_name'] ); ?></td>
+                                <td><?php echo string_display_line( $t_log['note'] ); ?></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </td>
-</tr>
+    </div>
+</div>
 <?php
     }
 }
