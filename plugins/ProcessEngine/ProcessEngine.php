@@ -222,7 +222,10 @@ class ProcessEnginePlugin extends MantisPlugin {
         }
 
         // Başlangıç adımının handler_id'si varsa otomatik ata
-        if( (int) $t_step['handler_id'] > 0 ) {
+        if( isset( $t_step['handler_id'] )
+            && (int) $t_step['handler_id'] > 0
+            && user_exists( (int) $t_step['handler_id'] )
+        ) {
             $p_bug_data->handler_id = (int) $t_step['handler_id'];
         }
 
@@ -260,13 +263,25 @@ class ProcessEnginePlugin extends MantisPlugin {
                 }
 
                 // Otomatik sorumlu atama: yeni adımın handler_id'si varsa ata
-                if( $t_step !== null && (int) $t_step['handler_id'] > 0 ) {
+                // NOT: bug_set_field() ve bugnote_add() hook içinde çağrılamaz
+                // — MantisBT bug cache'ini bozar. Ertelenmiş güncelleme kullanıyoruz.
+                if( $t_step !== null
+                    && isset( $t_step['handler_id'] )
+                    && (int) $t_step['handler_id'] > 0
+                    && user_exists( (int) $t_step['handler_id'] )
+                ) {
                     $t_handler_id = (int) $t_step['handler_id'];
-                    bug_set_field( $p_bug_id, 'handler_id', $t_handler_id );
-                    $t_handler_name = user_get_name( $t_handler_id );
-                    bugnote_add( $p_bug_id,
-                        sprintf( plugin_lang_get( 'auto_handler_assigned' ), $t_handler_name ),
-                        0, false );
+                    $t_target_bug_id = (int) $p_bug_id;
+                    register_shutdown_function( function() use ( $t_target_bug_id, $t_handler_id ) {
+                        if( bug_exists( $t_target_bug_id ) ) {
+                            $t_bug_table = db_get_table( 'bug' );
+                            db_param_push();
+                            db_query(
+                                "UPDATE $t_bug_table SET handler_id = " . db_param() . " WHERE id = " . db_param(),
+                                array( $t_handler_id, $t_target_bug_id )
+                            );
+                        }
+                    });
                 }
             }
         }

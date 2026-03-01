@@ -74,6 +74,16 @@ Tüm tablo adları `mantis_plugin_ProcessEngine_` ön ekiyle başlar:
 - AJAX endpoint'leri: JSON giriş (`php://input`) + JSON çıkış (`Content-Type: application/json`)
 - Parametreli sorgular: `db_param_push()` + `db_param()` kullanılır (SQL injection koruması)
 
+## KRİTİK: MantisBT Çekirdek İşlevleri Asla Bozulmamalı
+Standart MantisBT işlemleri (sorun oluşturma, durum değiştirme, atama, not ekleme vb.) **HİÇBİR KOŞULDA** bozulmamalıdır. Bu kural en yüksek önceliklidir.
+
+**Event hook kuralları:**
+- `EVENT_UPDATE_BUG` hook'u içinde **asla** `bug_set_field()`, `bugnote_add()` veya bug cache'ini bozan fonksiyonlar çağrılmamalıdır — MantisBT'nin iç cache mekanizmasını bozar
+- Hook içinde DB güncellemesi gerekiyorsa `register_shutdown_function()` ile ertelenmelidir
+- `EVENT_REPORT_BUG` hook'unda `$p_bug_data` özellikleri güvenle değiştirilebilir (bug henüz DB'ye yazılmamıştır)
+- Schema ile eklenen yeni sütunlara erişimde **her zaman** `isset()` kontrolü yapılmalıdır (schema henüz uygulanmamış olabilir)
+- Kullanıcı ID referanslarında **her zaman** `user_exists()` kontrolü yapılmalıdır
+
 ## Akış Durumları
 | Kod | Durum | Açıklama |
 |-----|-------|----------|
