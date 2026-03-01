@@ -15,7 +15,8 @@ layout_page_begin();
 
 $t_stats = process_get_dashboard_stats();
 $t_filter = gpc_get_string( 'filter', 'all' );
-$t_bugs = process_get_dashboard_bugs( $t_filter );
+$t_department = gpc_get_string( 'department', '' );
+$t_bugs = process_get_dashboard_bugs( $t_filter, $t_department );
 ?>
 
 <div class="col-md-12 col-xs-12">
@@ -97,16 +98,36 @@ $t_bugs = process_get_dashboard_bugs( $t_filter );
         </div>
         <div class="widget-body">
             <div class="widget-toolbox padding-8">
-                <div class="btn-group">
+                <div class="btn-group" style="margin-right: 15px;">
                     <?php
                     $t_filters = array( 'all', 'active', 'sla_exceeded', 'completed' );
                     foreach( $t_filters as $t_f ) {
                         $t_active_class = ( $t_filter === $t_f ) ? 'btn-primary' : 'btn-white';
                         $t_label = plugin_lang_get( 'filter_' . $t_f );
-                        $t_url = plugin_page( 'dashboard' ) . '&filter=' . $t_f;
+                        $t_url = plugin_page( 'dashboard' ) . '&filter=' . $t_f . ( $t_department !== '' ? '&department=' . urlencode( $t_department ) : '' );
                         echo '<a href="' . $t_url . '" class="btn btn-sm ' . $t_active_class . '">' . $t_label . '</a> ';
                     }
                     ?>
+                </div>
+                <div class="btn-group">
+                    <select id="pe-dept-filter" class="form-control input-sm" style="display:inline-block; width:auto;" onchange="window.location.href='<?php echo plugin_page( 'dashboard' ) . '&filter=' . urlencode( $t_filter ); ?>&department=' + encodeURIComponent(this.value);">
+                        <option value=""><?php echo plugin_lang_get( 'all_departments' ); ?></option>
+                        <?php
+                        $t_departments = array(
+                            'Satış'           => plugin_lang_get( 'dept_sales' ),
+                            'Fiyatlandırma'   => plugin_lang_get( 'dept_pricing' ),
+                            'Satış Operasyon' => plugin_lang_get( 'dept_sales_ops' ),
+                            'Satınalma'       => plugin_lang_get( 'dept_procurement' ),
+                            'ArGe'            => plugin_lang_get( 'dept_rnd' ),
+                            'Yönetim'         => plugin_lang_get( 'dept_management' ),
+                            'Kalite'          => plugin_lang_get( 'dept_quality' ),
+                        );
+                        foreach( $t_departments as $t_dept_val => $t_dept_label ) {
+                            $t_selected = ( $t_department === $t_dept_val ) ? 'selected' : '';
+                            echo '<option value="' . string_attribute( $t_dept_val ) . '" ' . $t_selected . '>' . $t_dept_label . '</option>';
+                        }
+                        ?>
+                    </select>
                 </div>
             </div>
             <div class="widget-main no-padding">
@@ -118,6 +139,8 @@ $t_bugs = process_get_dashboard_bugs( $t_filter );
                                 <th><?php echo plugin_lang_get( 'col_summary' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_current_step' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_department' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_progress' ); ?></th>
+                                <th><?php echo plugin_lang_get( 'col_handler' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_sla_status' ); ?></th>
                                 <th><?php echo plugin_lang_get( 'col_updated' ); ?></th>
                             </tr>
@@ -125,7 +148,7 @@ $t_bugs = process_get_dashboard_bugs( $t_filter );
                         <tbody>
                             <?php if( empty( $t_bugs ) ) { ?>
                             <tr>
-                                <td colspan="6" class="center"><?php echo plugin_lang_get( 'no_data' ); ?></td>
+                                <td colspan="8" class="center"><?php echo plugin_lang_get( 'no_data' ); ?></td>
                             </tr>
                             <?php } else {
                                 foreach( $t_bugs as $t_bug_row ) {
@@ -145,6 +168,18 @@ $t_bugs = process_get_dashboard_bugs( $t_filter );
                                 <td><?php echo string_display_line( $t_bug_row['summary'] ); ?></td>
                                 <td><?php echo string_display_line( $t_bug_row['step_name'] ); ?></td>
                                 <td><?php echo string_display_line( $t_bug_row['department'] ); ?></td>
+                                <td>
+                                    <?php
+                                    $t_pct = isset( $t_bug_row['progress_pct'] ) ? (int) $t_bug_row['progress_pct'] : 0;
+                                    $t_bar_class = ( $t_pct >= 100 ) ? 'pe-progress-bar-fill pe-progress-complete' : 'pe-progress-bar-fill';
+                                    ?>
+                                    <div class="pe-progress-bar-wrapper">
+                                        <div class="<?php echo $t_bar_class; ?>" style="width: <?php echo $t_pct; ?>%;">
+                                            <?php echo $t_pct; ?>%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><?php echo string_display_line( isset( $t_bug_row['handler_name'] ) ? $t_bug_row['handler_name'] : '-' ); ?></td>
                                 <td>
                                     <span class="pe-sla-badge <?php echo $t_sla_class; ?>">
                                         <?php echo string_display_line( $t_bug_row['sla_status'] ); ?>

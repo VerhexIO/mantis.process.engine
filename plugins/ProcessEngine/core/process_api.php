@@ -213,6 +213,94 @@ function process_transition_exists( $p_flow_id, $p_from_status, $p_to_status ) {
 }
 
 /**
+ * Get flow progress information for a bug.
+ * Returns all steps with their completion status.
+ *
+ * @param int $p_bug_id Bug ID
+ * @return array|null Progress data or null if no process
+ */
+function process_get_flow_progress( $p_bug_id ) {
+    $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
+    $t_flow = process_get_active_flow_for_project( $t_project_id );
+    if( $t_flow === null ) {
+        return null;
+    }
+
+    require_once( dirname( __FILE__ ) . '/flow_api.php' );
+    $t_steps = flow_get_steps( (int) $t_flow['id'] );
+    if( empty( $t_steps ) ) {
+        return null;
+    }
+
+    // Sürecin geçtiği tüm durum loglarını al
+    $t_logs = process_get_logs_for_bug( $p_bug_id );
+    $t_visited_step_ids = array();
+    foreach( $t_logs as $t_log ) {
+        if( (int) $t_log['step_id'] > 0 ) {
+            $t_visited_step_ids[(int) $t_log['step_id']] = true;
+        }
+    }
+
+    // Mevcut durumu al
+    $t_current = process_get_current_step_for_bug( $p_bug_id );
+    $t_current_step_id = $t_current !== null ? (int) $t_current['step_id'] : 0;
+
+    // SLA bilgisi al
+    $t_sla_table = plugin_table( 'sla_tracking' );
+    db_param_push();
+    $t_sla_query = "SELECT * FROM $t_sla_table
+        WHERE bug_id = " . db_param() . "
+        AND completed_at IS NULL
+        ORDER BY id DESC LIMIT 1";
+    $t_sla_result = db_query( $t_sla_query, array( (int) $p_bug_id ) );
+    $t_sla_row = db_fetch_array( $t_sla_result );
+
+    // Her adımın durumunu belirle
+    $t_step_list = array();
+    $t_current_index = -1;
+    foreach( $t_steps as $i => $t_step ) {
+        $t_step_id = (int) $t_step['id'];
+        if( $t_step_id === $t_current_step_id ) {
+            $t_status = 'current';
+            $t_current_index = $i;
+        } else if( isset( $t_visited_step_ids[$t_step_id] ) && $t_step_id !== $t_current_step_id ) {
+            $t_status = 'completed';
+        } else {
+            $t_status = 'pending';
+        }
+        $t_step_list[] = array(
+            'id'            => $t_step_id,
+            'name'          => $t_step['name'],
+            'department'    => $t_step['department'],
+            'handler_id'    => isset( $t_step['handler_id'] ) ? (int) $t_step['handler_id'] : 0,
+            'sla_hours'     => (int) $t_step['sla_hours'],
+            'status'        => $t_status,
+        );
+    }
+
+    $t_current_sla = null;
+    if( $t_sla_row !== false ) {
+        $t_now = time();
+        $t_deadline = (int) $t_sla_row['deadline_at'];
+        $t_remaining_sec = $t_deadline - $t_now;
+        $t_current_sla = array(
+            'sla_status'    => $t_sla_row['sla_status'],
+            'deadline_at'   => $t_deadline,
+            'remaining_sec' => $t_remaining_sec,
+            'remaining_hrs' => round( $t_remaining_sec / 3600, 1 ),
+        );
+    }
+
+    return array(
+        'flow'               => $t_flow,
+        'steps'              => $t_step_list,
+        'current_step_index' => $t_current_index,
+        'total_steps'        => count( $t_step_list ),
+        'current_sla'        => $t_current_sla,
+    );
+}
+
+/**
  * Get all unique bug IDs that have process log entries.
  *
  * @return array Array of bug IDs
@@ -298,7 +386,7 @@ function process_get_dashboard_stats() {
  * @param string $p_filter Filter type: 'all', 'active', 'sla_exceeded', 'completed'
  * @return array Array of bug process data
  */
-function process_get_dashboard_bugs( $p_filter = 'all' ) {
+function process_get_dashboard_bugs( $p_filter = 'all', $p_department = '' ) {
     $t_log_table = plugin_table( 'log' );
     $t_step_table = plugin_table( 'step' );
     $t_sla_table = plugin_table( 'sla_tracking' );
@@ -345,14 +433,38 @@ function process_get_dashboard_bugs( $p_filter = 'all' ) {
         if( $p_filter === 'completed' && !$t_is_completed ) continue;
         if( $p_filter === 'sla_exceeded' && !$t_is_sla_exceeded ) continue;
 
+        // Apply department filter
+        if( $p_department !== '' && $t_row['department'] !== $p_department ) continue;
+
+        // İlerleme bilgisi
+        $t_progress_data = process_get_flow_progress( $t_bug_id );
+        $t_progress_pct = 0;
+        if( $t_progress_data !== null && $t_progress_data['total_steps'] > 0 ) {
+            $t_completed_count = 0;
+            foreach( $t_progress_data['steps'] as $t_ps ) {
+                if( $t_ps['status'] === 'completed' ) $t_completed_count++;
+            }
+            if( $t_progress_data['current_step_index'] >= 0 ) {
+                $t_progress_pct = round( ( $t_progress_data['current_step_index'] + 1 ) / $t_progress_data['total_steps'] * 100 );
+            } else {
+                $t_progress_pct = round( $t_completed_count / $t_progress_data['total_steps'] * 100 );
+            }
+        }
+
+        // Sorumlu kişi
+        $t_handler = (int) $t_bug->handler_id;
+        $t_handler_name = ( $t_handler > 0 ) ? user_get_name( $t_handler ) : '-';
+
         $t_bugs[] = array(
-            'bug_id'      => $t_bug_id,
-            'summary'     => $t_bug->summary,
-            'step_name'   => $t_row['step_name'],
-            'department'  => $t_row['department'],
-            'sla_status'  => $t_sla_status,
-            'updated_at'  => $t_row['created_at'],
-            'bug_status'  => $t_status,
+            'bug_id'       => $t_bug_id,
+            'summary'      => $t_bug->summary,
+            'step_name'    => $t_row['step_name'],
+            'department'   => $t_row['department'],
+            'sla_status'   => $t_sla_status,
+            'updated_at'   => $t_row['created_at'],
+            'bug_status'   => $t_status,
+            'progress_pct' => $t_progress_pct,
+            'handler_name' => $t_handler_name,
         );
     }
 

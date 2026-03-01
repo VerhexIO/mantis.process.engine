@@ -63,3 +63,122 @@
 .table-responsive {
     overflow-x: auto;
 }
+
+/* ---- Process Info Panel ---- */
+.pe-info-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 10px 0;
+}
+.pe-info-item {
+    flex: 1 1 150px;
+    min-width: 120px;
+}
+.pe-info-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.pe-info-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+.pe-sla-overdue-text {
+    color: #e74c3c;
+}
+
+/* ---- Step Progress Bar (Stepper) ---- */
+.pe-stepper {
+    display: flex;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 15px 10px;
+    gap: 0;
+}
+.pe-stepper-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-width: 100px;
+    flex: 1;
+}
+.pe-step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #ccc;
+    position: relative;
+    z-index: 2;
+}
+.pe-step-completed .pe-step-circle {
+    background-color: #27ae60;
+}
+.pe-step-current .pe-step-circle {
+    background-color: #3498db;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
+}
+.pe-step-pending .pe-step-circle {
+    background-color: #bdc3c7;
+}
+.pe-step-label {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    word-break: break-word;
+    max-width: 110px;
+}
+.pe-step-dept {
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    margin-top: 2px;
+}
+.pe-step-connector {
+    position: absolute;
+    top: 18px;
+    left: calc(50% + 18px);
+    width: calc(100% - 36px);
+    height: 3px;
+    background-color: #ddd;
+    z-index: 1;
+}
+.pe-step-completed .pe-step-connector {
+    background-color: #27ae60;
+}
+.pe-step-current .pe-step-connector {
+    background-color: #ddd;
+}
+
+/* ---- Dashboard Progress Bar ---- */
+.pe-progress-bar-wrapper {
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 20px;
+    min-width: 80px;
+}
+.pe-progress-bar-fill {
+    height: 100%;
+    background-color: #3498db;
+    text-align: center;
+    color: #fff;
+    font-size: 11px;
+    line-height: 20px;
+    font-weight: bold;
+    transition: width 0.3s ease;
+}
+.pe-progress-bar-fill.pe-progress-complete {
+    background-color: #27ae60;
+}

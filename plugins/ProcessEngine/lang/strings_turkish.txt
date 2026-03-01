@@ -130,3 +130,22 @@ $s_plugin_ProcessEngine_flow_project = 'Proje';
 $s_plugin_ProcessEngine_all_projects = 'Tüm Projeler';
 $s_plugin_ProcessEngine_process_started = 'Süreç başlatıldı';
 $s_plugin_ProcessEngine_out_of_flow_transition = 'Akış dışı geçiş';
+
+# Otomatik atama
+$s_plugin_ProcessEngine_step_handler = 'Sorumlu Kişi';
+$s_plugin_ProcessEngine_no_auto_assign = 'Otomatik atama yok';
+$s_plugin_ProcessEngine_auto_handler_assigned = 'Otomatik atama: %s sorumlu olarak atandı.';
+
+# Süreç bilgi paneli
+$s_plugin_ProcessEngine_process_info = 'Süreç Bilgisi';
+$s_plugin_ProcessEngine_current_step = 'Mevcut Adım';
+$s_plugin_ProcessEngine_step_progress = 'İlerleme';
+$s_plugin_ProcessEngine_step_of = 'Adım %d / %d';
+$s_plugin_ProcessEngine_sla_remaining = 'SLA Kalan';
+$s_plugin_ProcessEngine_sla_overdue = 'Süre aşıldı';
+$s_plugin_ProcessEngine_responsible = 'Sorumlu';
+
+# Dashboard ek sütunlar
+$s_plugin_ProcessEngine_all_departments = 'Tüm Departmanlar';
+$s_plugin_ProcessEngine_col_handler = 'Sorumlu';
+$s_plugin_ProcessEngine_col_progress = 'İlerleme';

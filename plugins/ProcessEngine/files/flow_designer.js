@@ -78,6 +78,7 @@
             sla_hours: parseInt(s.sla_hours) || 0,
             step_order: parseInt(s.step_order) || 0,
             role: s.role || '',
+            handler_id: parseInt(s.handler_id) || 0,
             position_x: parseInt(s.position_x) || 100,
             position_y: parseInt(s.position_y) || 100
         };
@@ -399,6 +400,7 @@
                     step.sla_hours = parseInt(document.getElementById('pe-modal-sla').value) || 0;
                     step.role = document.getElementById('pe-modal-role').value;
                     step.mantis_status = parseInt(document.getElementById('pe-modal-mantis-status').value) || 10;
+                    step.handler_id = parseInt(document.getElementById('pe-modal-handler').value) || 0;
                     isDirty = true;
                     render();
                 }
@@ -430,6 +432,7 @@
         document.getElementById('pe-modal-sla').value = step.sla_hours;
         document.getElementById('pe-modal-role').value = step.role;
         document.getElementById('pe-modal-mantis-status').value = step.mantis_status;
+        document.getElementById('pe-modal-handler').value = step.handler_id;
 
         $('#pe-step-modal').modal('show');
     }
@@ -453,6 +456,7 @@
                 sla_hours: 0,
                 step_order: steps.length + 1,
                 role: '',
+                handler_id: 0,
                 position_x: maxX,
                 position_y: 100
             });
@@ -487,6 +491,7 @@
                     sla_hours: s.sla_hours,
                     step_order: s.step_order,
                     role: s.role,
+                    handler_id: s.handler_id,
                     position_x: s.position_x,
                     position_y: s.position_y
                 };
@@ -562,6 +567,7 @@
                     sla_hours: s.sla_hours,
                     step_order: s.step_order,
                     role: s.role,
+                    handler_id: s.handler_id,
                     position_x: s.position_x,
                     position_y: s.position_y
                 };

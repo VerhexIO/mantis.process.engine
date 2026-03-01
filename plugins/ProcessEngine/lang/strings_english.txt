@@ -130,3 +130,22 @@ $s_plugin_ProcessEngine_flow_project = 'Project';
 $s_plugin_ProcessEngine_all_projects = 'All Projects';
 $s_plugin_ProcessEngine_process_started = 'Process started';
 $s_plugin_ProcessEngine_out_of_flow_transition = 'Out-of-flow transition';
+
+# Auto assignment
+$s_plugin_ProcessEngine_step_handler = 'Responsible Person';
+$s_plugin_ProcessEngine_no_auto_assign = 'No auto assignment';
+$s_plugin_ProcessEngine_auto_handler_assigned = 'Auto assignment: %s has been assigned as responsible.';
+
+# Process info panel
+$s_plugin_ProcessEngine_process_info = 'Process Info';
+$s_plugin_ProcessEngine_current_step = 'Current Step';
+$s_plugin_ProcessEngine_step_progress = 'Progress';
+$s_plugin_ProcessEngine_step_of = 'Step %d / %d';
+$s_plugin_ProcessEngine_sla_remaining = 'SLA Remaining';
+$s_plugin_ProcessEngine_sla_overdue = 'Overdue';
+$s_plugin_ProcessEngine_responsible = 'Responsible';
+
+# Dashboard extra columns
+$s_plugin_ProcessEngine_all_departments = 'All Departments';
+$s_plugin_ProcessEngine_col_handler = 'Responsible';
+$s_plugin_ProcessEngine_col_progress = 'Progress';

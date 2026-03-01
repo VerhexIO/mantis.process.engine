@@ -271,6 +271,25 @@ if( $t_flow_id === 0 ) {
                         <?php } ?>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label><?php echo plugin_lang_get( 'step_handler' ); ?></label>
+                    <select id="pe-modal-handler" class="form-control input-sm">
+                        <option value="0"><?php echo plugin_lang_get( 'no_auto_assign' ); ?></option>
+                        <?php
+                        $t_project_id_for_users = (int) $t_flow['project_id'];
+                        if( $t_project_id_for_users > 0 ) {
+                            $t_users = project_get_all_user_rows( $t_project_id_for_users );
+                        } else {
+                            $t_users = project_get_all_user_rows( ALL_PROJECTS );
+                        }
+                        foreach( $t_users as $t_user ) {
+                            $t_uid = (int) $t_user['id'];
+                            $t_uname = user_get_name( $t_uid );
+                        ?>
+                        <option value="<?php echo $t_uid; ?>"><?php echo string_display_line( $t_uname ); ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">İptal</button>

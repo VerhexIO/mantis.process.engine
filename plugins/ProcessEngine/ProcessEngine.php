@@ -176,6 +176,12 @@ class ProcessEnginePlugin extends MantisPlugin {
             array( 'idx_pe_trans_flow', plugin_table( 'transition' ), 'flow_id' )
         );
 
+        // 9: Add handler_id column to step table
+        $t_schema[] = array(
+            'AddColumnSQL',
+            array( plugin_table( 'step' ), "handler_id I UNSIGNED DEFAULT '0'" )
+        );
+
         return $t_schema;
     }
 
@@ -215,6 +221,11 @@ class ProcessEnginePlugin extends MantisPlugin {
             sla_start_tracking( $p_bug_id, (int) $t_step['id'], (int) $t_flow['id'], (int) $t_step['sla_hours'] );
         }
 
+        // Başlangıç adımının handler_id'si varsa otomatik ata
+        if( (int) $t_step['handler_id'] > 0 ) {
+            $p_bug_data->handler_id = (int) $t_step['handler_id'];
+        }
+
         return $p_bug_data;
     }
 
@@ -246,6 +257,16 @@ class ProcessEnginePlugin extends MantisPlugin {
                 $t_step = process_find_step_by_status( $t_flow['id'], $t_new_status );
                 if( $t_step !== null && (int) $t_step['sla_hours'] > 0 ) {
                     sla_start_tracking( $p_bug_id, (int) $t_step['id'], (int) $t_flow['id'], (int) $t_step['sla_hours'] );
+                }
+
+                // Otomatik sorumlu atama: yeni adımın handler_id'si varsa ata
+                if( $t_step !== null && (int) $t_step['handler_id'] > 0 ) {
+                    $t_handler_id = (int) $t_step['handler_id'];
+                    bug_set_field( $p_bug_id, 'handler_id', $t_handler_id );
+                    $t_handler_name = user_get_name( $t_handler_id );
+                    bugnote_add( $p_bug_id,
+                        sprintf( plugin_lang_get( 'auto_handler_assigned' ), $t_handler_name ),
+                        0, false );
                 }
             }
         }
@@ -290,7 +311,7 @@ class ProcessEnginePlugin extends MantisPlugin {
     }
 
     /**
-     * Hook: EVENT_VIEW_BUG_EXTRA - show process timeline on issue detail
+     * Hook: EVENT_VIEW_BUG_EXTRA - show process info, stepper, and timeline
      */
     public function on_view_bug_extra( $p_event, $p_bug_id ) {
         if( !access_has_global_level( plugin_config_get( 'view_threshold' ) ) ) {
@@ -304,6 +325,145 @@ class ProcessEnginePlugin extends MantisPlugin {
             return;
         }
 
+        $t_progress = process_get_flow_progress( $p_bug_id );
+
+        // 1. Süreç Bilgi Paneli
+        $this->render_process_info_panel( $p_bug_id, $t_progress );
+
+        // 2. Görsel Adım Çubuğu
+        if( $t_progress !== null ) {
+            $this->render_step_progress_bar( $t_progress );
+        }
+
+        // 3. Süreç Zaman Çizelgesi
+        $this->render_process_timeline( $t_logs );
+    }
+
+    /**
+     * Render the process info panel (current step, department, progress, SLA, handler)
+     */
+    private function render_process_info_panel( $p_bug_id, $t_progress ) {
+        if( $t_progress === null ) {
+            return;
+        }
+
+        $t_current_index = $t_progress['current_step_index'];
+        $t_total = $t_progress['total_steps'];
+        $t_current_step = ( $t_current_index >= 0 && isset( $t_progress['steps'][$t_current_index] ) )
+            ? $t_progress['steps'][$t_current_index] : null;
+
+        $t_step_name = $t_current_step ? $t_current_step['name'] : '-';
+        $t_department = $t_current_step ? $t_current_step['department'] : '-';
+        $t_handler_id = $t_current_step ? $t_current_step['handler_id'] : 0;
+        $t_handler_name = ( $t_handler_id > 0 ) ? user_get_name( $t_handler_id ) : '-';
+
+        // Tamamlanan adım sayısını hesapla
+        $t_completed = 0;
+        foreach( $t_progress['steps'] as $s ) {
+            if( $s['status'] === 'completed' ) $t_completed++;
+        }
+        $t_progress_num = $t_current_index >= 0 ? ( $t_current_index + 1 ) : $t_completed;
+
+        // SLA kalan süre
+        $t_sla_text = '-';
+        $t_sla_class = '';
+        if( $t_progress['current_sla'] !== null ) {
+            $t_sla = $t_progress['current_sla'];
+            if( $t_sla['remaining_sec'] > 0 ) {
+                $t_sla_text = $t_sla['remaining_hrs'] . ' ' . plugin_lang_get( 'hours' );
+            } else {
+                $t_sla_text = plugin_lang_get( 'sla_overdue' );
+                $t_sla_class = 'pe-sla-overdue-text';
+            }
+        }
+?>
+<div class="col-md-12 col-xs-12">
+    <div class="space-10"></div>
+    <div class="widget-box widget-color-blue2">
+        <div class="widget-header widget-header-small">
+            <h4 class="widget-title lighter">
+                <i class="ace-icon fa fa-info-circle"></i>
+                <?php echo plugin_lang_get( 'process_info' ); ?>
+            </h4>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="pe-info-panel">
+                    <div class="pe-info-item">
+                        <div class="pe-info-label"><?php echo plugin_lang_get( 'current_step' ); ?></div>
+                        <div class="pe-info-value"><?php echo string_display_line( $t_step_name ); ?></div>
+                    </div>
+                    <div class="pe-info-item">
+                        <div class="pe-info-label"><?php echo plugin_lang_get( 'col_department' ); ?></div>
+                        <div class="pe-info-value"><?php echo string_display_line( $t_department ); ?></div>
+                    </div>
+                    <div class="pe-info-item">
+                        <div class="pe-info-label"><?php echo plugin_lang_get( 'step_progress' ); ?></div>
+                        <div class="pe-info-value"><?php echo sprintf( plugin_lang_get( 'step_of' ), $t_progress_num, $t_total ); ?></div>
+                    </div>
+                    <div class="pe-info-item">
+                        <div class="pe-info-label"><?php echo plugin_lang_get( 'sla_remaining' ); ?></div>
+                        <div class="pe-info-value <?php echo $t_sla_class; ?>"><?php echo $t_sla_text; ?></div>
+                    </div>
+                    <div class="pe-info-item">
+                        <div class="pe-info-label"><?php echo plugin_lang_get( 'responsible' ); ?></div>
+                        <div class="pe-info-value"><?php echo string_display_line( $t_handler_name ); ?></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
+    }
+
+    /**
+     * Render the visual step progress bar (stepper)
+     */
+    private function render_step_progress_bar( $t_progress ) {
+?>
+<div class="col-md-12 col-xs-12">
+    <div class="space-10"></div>
+    <div class="widget-box widget-color-blue2">
+        <div class="widget-header widget-header-small">
+            <h4 class="widget-title lighter">
+                <i class="ace-icon fa fa-tasks"></i>
+                <?php echo plugin_lang_get( 'step_progress' ); ?>
+            </h4>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main">
+                <div class="pe-stepper">
+                    <?php foreach( $t_progress['steps'] as $i => $t_step ) {
+                        $t_circle_class = 'pe-step-pending';
+                        if( $t_step['status'] === 'completed' ) {
+                            $t_circle_class = 'pe-step-completed';
+                        } else if( $t_step['status'] === 'current' ) {
+                            $t_circle_class = 'pe-step-current';
+                        }
+                        $t_is_last = ( $i === count( $t_progress['steps'] ) - 1 );
+                    ?>
+                    <div class="pe-stepper-item <?php echo $t_circle_class; ?>">
+                        <div class="pe-step-circle"><?php echo ( $i + 1 ); ?></div>
+                        <div class="pe-step-label"><?php echo string_display_line( $t_step['name'] ); ?></div>
+                        <div class="pe-step-dept"><?php echo string_display_line( $t_step['department'] ); ?></div>
+                        <?php if( !$t_is_last ) { ?>
+                        <div class="pe-step-connector"></div>
+                        <?php } ?>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
+    }
+
+    /**
+     * Render the process timeline table
+     */
+    private function render_process_timeline( $t_logs ) {
 ?>
 <div class="col-md-12 col-xs-12">
     <div class="space-10"></div>

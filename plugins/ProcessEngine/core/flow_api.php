@@ -150,9 +150,9 @@ function flow_add_step( $p_flow_id, $p_data ) {
     $t_table = plugin_table( 'step' );
     db_param_push();
     db_query(
-        "INSERT INTO $t_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y)
+        "INSERT INTO $t_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y, handler_id)
          VALUES (" . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", "
-         . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
+         . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
         array(
             (int) $p_flow_id,
             $p_data['name'],
@@ -163,6 +163,7 @@ function flow_add_step( $p_flow_id, $p_data ) {
             isset( $p_data['role'] ) ? $p_data['role'] : '',
             isset( $p_data['position_x'] ) ? (int) $p_data['position_x'] : 0,
             isset( $p_data['position_y'] ) ? (int) $p_data['position_y'] : 0,
+            isset( $p_data['handler_id'] ) ? (int) $p_data['handler_id'] : 0,
         )
     );
 
@@ -186,7 +187,7 @@ function flow_update_step( $p_step_id, $p_data ) {
     $t_sets = array();
     $t_params = array();
 
-    $t_fields = array( 'name', 'department', 'mantis_status', 'sla_hours', 'step_order', 'role', 'position_x', 'position_y' );
+    $t_fields = array( 'name', 'department', 'mantis_status', 'sla_hours', 'step_order', 'role', 'position_x', 'position_y', 'handler_id' );
     foreach( $t_fields as $t_field ) {
         if( isset( $p_data[$t_field] ) ) {
             $t_sets[] = "$t_field = " . db_param();
