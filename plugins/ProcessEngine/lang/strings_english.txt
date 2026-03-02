@@ -114,6 +114,8 @@ $s_plugin_ProcessEngine_config_business_hours_end = 'Business Hours End';
 $s_plugin_ProcessEngine_config_working_days = 'Working Days';
 $s_plugin_ProcessEngine_config_saved = 'Configuration saved.';
 $s_plugin_ProcessEngine_config_working_days_help = 'Comma-separated day numbers (1=Monday, 7=Sunday)';
+$s_plugin_ProcessEngine_config_departments = 'Departments';
+$s_plugin_ProcessEngine_config_departments_help = 'Comma-separated department names. Leave empty to allow free-form entry.';
 
 # Misc
 $s_plugin_ProcessEngine_hours = 'hours';
@@ -149,3 +151,7 @@ $s_plugin_ProcessEngine_responsible = 'Responsible';
 $s_plugin_ProcessEngine_all_departments = 'All Departments';
 $s_plugin_ProcessEngine_col_handler = 'Responsible';
 $s_plugin_ProcessEngine_col_progress = 'Progress';
+
+# Department management
+$s_plugin_ProcessEngine_dept_other = 'Other (Free Entry)';
+$s_plugin_ProcessEngine_dept_custom_placeholder = 'Type department name...';

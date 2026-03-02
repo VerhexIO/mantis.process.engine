@@ -390,13 +390,28 @@
     function bindModal() {
         var saveBtn = document.getElementById('pe-modal-save');
         var deleteBtn = document.getElementById('pe-modal-delete');
+        var deptSelect = document.getElementById('pe-modal-department');
+        var deptCustom = document.getElementById('pe-modal-department-custom');
+
+        // "Diğer" seçilince serbest metin giriş alanını göster
+        if (deptSelect && deptCustom) {
+            deptSelect.addEventListener('change', function() {
+                deptCustom.style.display = (this.value === '__other__') ? 'block' : 'none';
+                if (this.value !== '__other__') deptCustom.value = '';
+            });
+        }
+
         if (saveBtn) {
             saveBtn.addEventListener('click', function() {
                 var id = document.getElementById('pe-modal-step-id').value;
                 var step = findStep(id);
                 if (step) {
                     step.name = document.getElementById('pe-modal-name').value;
-                    step.department = document.getElementById('pe-modal-department').value;
+                    var deptVal = deptSelect.value;
+                    if (deptVal === '__other__' && deptCustom) {
+                        deptVal = deptCustom.value.trim();
+                    }
+                    step.department = deptVal;
                     step.sla_hours = parseInt(document.getElementById('pe-modal-sla').value) || 0;
                     step.role = document.getElementById('pe-modal-role').value;
                     step.mantis_status = parseInt(document.getElementById('pe-modal-mantis-status').value) || 10;
@@ -428,7 +443,25 @@
 
         document.getElementById('pe-modal-step-id').value = step.id;
         document.getElementById('pe-modal-name').value = step.name;
-        document.getElementById('pe-modal-department').value = step.department;
+
+        // Departman: dropdown'da yoksa "Diğer" + custom input göster
+        var deptSel = document.getElementById('pe-modal-department');
+        var deptCust = document.getElementById('pe-modal-department-custom');
+        var deptFound = false;
+        for (var i = 0; i < deptSel.options.length; i++) {
+            if (deptSel.options[i].value === step.department && step.department !== '__other__') {
+                deptFound = true;
+                break;
+            }
+        }
+        if (deptFound || step.department === '' ) {
+            deptSel.value = step.department;
+            if (deptCust) { deptCust.style.display = 'none'; deptCust.value = ''; }
+        } else {
+            deptSel.value = '__other__';
+            if (deptCust) { deptCust.style.display = 'block'; deptCust.value = step.department; }
+        }
+
         document.getElementById('pe-modal-sla').value = step.sla_hours;
         document.getElementById('pe-modal-role').value = step.role;
         document.getElementById('pe-modal-mantis-status').value = step.mantis_status;

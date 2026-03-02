@@ -114,6 +114,8 @@ $s_plugin_ProcessEngine_config_business_hours_end = 'İş Saati Bitiş';
 $s_plugin_ProcessEngine_config_working_days = 'Çalışma Günleri';
 $s_plugin_ProcessEngine_config_saved = 'Yapılandırma kaydedildi.';
 $s_plugin_ProcessEngine_config_working_days_help = 'Virgülle ayrılmış gün numaraları (1=Pazartesi, 7=Pazar)';
+$s_plugin_ProcessEngine_config_departments = 'Departmanlar';
+$s_plugin_ProcessEngine_config_departments_help = 'Virgülle ayrılmış departman adları. Boş bırakılırsa serbest giriş yapılabilir.';
 
 # Misc
 $s_plugin_ProcessEngine_hours = 'saat';
@@ -149,3 +151,7 @@ $s_plugin_ProcessEngine_responsible = 'Sorumlu';
 $s_plugin_ProcessEngine_all_departments = 'Tüm Departmanlar';
 $s_plugin_ProcessEngine_col_handler = 'Sorumlu';
 $s_plugin_ProcessEngine_col_progress = 'İlerleme';
+
+# Departman yönetimi
+$s_plugin_ProcessEngine_dept_other = 'Diğer (Serbest Giriş)';
+$s_plugin_ProcessEngine_dept_custom_placeholder = 'Departman adını yazın...';

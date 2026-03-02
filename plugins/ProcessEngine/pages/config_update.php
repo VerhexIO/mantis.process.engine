@@ -34,9 +34,15 @@ $t_sla_warning_percent  = gpc_get_int( 'sla_warning_percent', 80 );
 $t_business_hours_start = gpc_get_int( 'business_hours_start', 9 );
 $t_business_hours_end   = gpc_get_int( 'business_hours_end', 18 );
 $t_working_days         = gpc_get_string( 'working_days', '1,2,3,4,5' );
+$t_departments          = gpc_get_string( 'departments', '' );
 
 // Validate working days format
 $t_working_days = preg_replace( '/[^0-9,]/', '', $t_working_days );
+
+// Clean departments: trim whitespace, remove empty entries
+$t_dept_arr = array_map( 'trim', explode( ',', $t_departments ) );
+$t_dept_arr = array_filter( $t_dept_arr, function( $v ) { return $v !== ''; } );
+$t_departments = implode( ', ', $t_dept_arr );
 
 // Validate business hours
 if( $t_business_hours_start < 0 || $t_business_hours_start > 23 ) {
@@ -60,6 +66,7 @@ plugin_config_set( 'sla_warning_percent',  $t_sla_warning_percent );
 plugin_config_set( 'business_hours_start', $t_business_hours_start );
 plugin_config_set( 'business_hours_end',   $t_business_hours_end );
 plugin_config_set( 'working_days',         $t_working_days );
+plugin_config_set( 'departments',          $t_departments );
 
 form_security_purge( 'ProcessEngine_config_update' );
 print_header_redirect( plugin_page( 'config_page', true ) );

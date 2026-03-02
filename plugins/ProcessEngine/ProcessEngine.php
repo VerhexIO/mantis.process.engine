@@ -39,6 +39,7 @@ class ProcessEnginePlugin extends MantisPlugin {
             'business_hours_start' => 9,
             'business_hours_end'   => 18,
             'working_days'         => '1,2,3,4,5',
+            'departments'          => '',
         );
     }
 

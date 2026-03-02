@@ -10,6 +10,8 @@ access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
 require_once( dirname( __DIR__ ) . '/core/process_api.php' );
 
+$t_dept_list = process_get_departments();
+
 layout_page_header( plugin_lang_get( 'dashboard_title' ) );
 layout_page_begin();
 
@@ -113,18 +115,9 @@ $t_bugs = process_get_dashboard_bugs( $t_filter, $t_department );
                     <select id="pe-dept-filter" class="form-control input-sm" style="display:inline-block; width:auto;" onchange="window.location.href='<?php echo plugin_page( 'dashboard' ) . '&filter=' . urlencode( $t_filter ); ?>&department=' + encodeURIComponent(this.value);">
                         <option value=""><?php echo plugin_lang_get( 'all_departments' ); ?></option>
                         <?php
-                        $t_departments = array(
-                            'Satış'           => plugin_lang_get( 'dept_sales' ),
-                            'Fiyatlandırma'   => plugin_lang_get( 'dept_pricing' ),
-                            'Satış Operasyon' => plugin_lang_get( 'dept_sales_ops' ),
-                            'Satınalma'       => plugin_lang_get( 'dept_procurement' ),
-                            'ArGe'            => plugin_lang_get( 'dept_rnd' ),
-                            'Yönetim'         => plugin_lang_get( 'dept_management' ),
-                            'Kalite'          => plugin_lang_get( 'dept_quality' ),
-                        );
-                        foreach( $t_departments as $t_dept_val => $t_dept_label ) {
-                            $t_selected = ( $t_department === $t_dept_val ) ? 'selected' : '';
-                            echo '<option value="' . string_attribute( $t_dept_val ) . '" ' . $t_selected . '>' . $t_dept_label . '</option>';
+                        foreach( $t_dept_list as $t_dept ) {
+                            $t_selected = ( $t_department === $t_dept ) ? 'selected' : '';
+                            echo '<option value="' . string_attribute( $t_dept ) . '" ' . $t_selected . '>' . string_display_line( $t_dept ) . '</option>';
                         }
                         ?>
                     </select>

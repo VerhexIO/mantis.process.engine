@@ -10,6 +10,7 @@ auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'manage_threshold' ) );
 
 require_once( dirname( __DIR__ ) . '/core/flow_api.php' );
+require_once( dirname( __DIR__ ) . '/core/process_api.php' );
 
 $t_flow_id = gpc_get_int( 'flow_id', 0 );
 $t_action = gpc_get_string( 'action', 'list' );
@@ -239,14 +240,14 @@ if( $t_flow_id === 0 ) {
                     <label><?php echo plugin_lang_get( 'step_department' ); ?></label>
                     <select id="pe-modal-department" class="form-control input-sm">
                         <option value="">--</option>
-                        <option value="Satış"><?php echo plugin_lang_get( 'dept_sales' ); ?></option>
-                        <option value="Fiyatlandırma"><?php echo plugin_lang_get( 'dept_pricing' ); ?></option>
-                        <option value="Satış Operasyon"><?php echo plugin_lang_get( 'dept_sales_ops' ); ?></option>
-                        <option value="Satınalma"><?php echo plugin_lang_get( 'dept_procurement' ); ?></option>
-                        <option value="ArGe"><?php echo plugin_lang_get( 'dept_rnd' ); ?></option>
-                        <option value="Yönetim"><?php echo plugin_lang_get( 'dept_management' ); ?></option>
-                        <option value="Kalite"><?php echo plugin_lang_get( 'dept_quality' ); ?></option>
+                        <?php
+                        $t_dept_list = process_get_departments();
+                        foreach( $t_dept_list as $t_dept ) { ?>
+                        <option value="<?php echo string_attribute( $t_dept ); ?>"><?php echo string_display_line( $t_dept ); ?></option>
+                        <?php } ?>
+                        <option value="__other__"><?php echo plugin_lang_get( 'dept_other' ); ?></option>
                     </select>
+                    <input type="text" id="pe-modal-department-custom" class="form-control input-sm" style="display:none; margin-top:5px;" placeholder="<?php echo plugin_lang_get( 'dept_custom_placeholder' ); ?>" />
                 </div>
                 <div class="form-group">
                     <label><?php echo plugin_lang_get( 'step_sla_hours' ); ?></label>

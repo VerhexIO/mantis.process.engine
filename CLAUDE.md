@@ -1,7 +1,7 @@
 # MantisBT ProcessEngine Plugin
 
 ## Genel Bilgiler
-MantisBT 2.24.2 (Schema 210) üzerinde çalışan bir "Süreç Motoru" eklentisi. Satış, Fiyatlandırma, Satış Operasyon, Satınalma ve ArGe departmanları arasındaki fiyat talebi iş akışlarını otomatize eder.
+MantisBT 2.24.2 (Schema 210) üzerinde çalışan bir "Süreç Motoru" eklentisi. Departmanlar arası fiyat talebi iş akışlarını otomatize eder. Departman listesi dinamik olarak yapılandırma sayfasından yönetilir (hardcode değildir).
 
 ## Dil Kuralı
 - **Tüm çıktılar, commit mesajları, açıklamalar ve yorumlar her zaman Türkçe olmalıdır.**
@@ -50,6 +50,8 @@ MantisBT 2.24.2 (Schema 210) üzerinde çalışan bir "Süreç Motoru" eklentisi
 │       └── seed_data.php           # Varsayılan 2 akış örneği
 ├── scripts/
 │   └── sla_cron.php                # Harici SLA cron betiği
+├── docs/
+│   └── Kullanim_Kilavuzu.md        # Kullanım kılavuzu (Türkçe)
 ├── CLAUDE.md                       # Bu dosya
 ├── .gitignore
 └── Yerel_Gelistirme_Rehberi_v1.docx
@@ -61,7 +63,7 @@ Tüm tablo adları `mantis_plugin_ProcessEngine_` ön ekiyle başlar:
 | Tablo | Açıklama |
 |-------|----------|
 | `flow_definition_table` | Akış tanımları (ad, açıklama, durum, proje) |
-| `step_table` | Akış adımları (departman, SLA, MantisBT durumu, konum) |
+| `step_table` | Akış adımları (departman, SLA, MantisBT durumu, konum, handler_id) |
 | `transition_table` | Adımlar arası geçişler (koşullu/koşulsuz) |
 | `log_table` | Süreç logu (bug_id, durum değişiklikleri, kullanıcı) |
 | `sla_tracking_table` | SLA takibi (deadline, uyarı, aşım, eskalasyon) |
@@ -107,6 +109,7 @@ Standart MantisBT işlemleri (sorun oluşturma, durum değiştirme, atama, not e
 'business_hours_start' => 9,            // İş saati başlangıç
 'business_hours_end'   => 18,           // İş saati bitiş
 'working_days'         => '1,2,3,4,5',  // Çalışma günleri (1=Pzt, 7=Paz)
+'departments'          => '',           // Virgülle ayrılmış departman adları (boş = serbest giriş)
 ```
 
 ## Docker Komutları
@@ -125,6 +128,17 @@ docker exec mantisbt php /var/www/html/scripts/sla_cron.php  # SLA cron çalış
 ## Git
 - **Repo**: https://github.com/VerhexIO/mantis.process.engine.git
 - **Commit mesajları Türkçe yazılmalıdır**
+
+## Departman Yönetimi
+Departman listesi dinamik olarak iki kaynaktan toplanır:
+- `departments` config anahtarı (virgülle ayrılmış, yapılandırma sayfasından yönetilir)
+- `step_table`'daki mevcut DISTINCT department değerleri
+
+`process_get_departments()` fonksiyonu (`core/process_api.php`) her iki kaynağı birleştirip sıralı döndürür. Akış tasarımcısında "Diğer" seçeneği ile serbest metin girişi de mümkündür.
+
+## Kısıtlamalar
+- **Çoklu Sorun Takibi DESTEKLENMİYOR:** Plugin "Tek Sorun, Çoklu Adım" modeli ile çalışır. Bir sorun tek bir akışta ilerler. Farklı sorunları birbirine bağlayan `parent_bug_id`, `process_group_id` gibi bir alan yoktur.
+- MantisBT'nin native `bug_relationship_table`'ı süreç bağlamında kullanılmamaktadır.
 
 ## KRİTİK: MantisBT Çekirdek İşlevleri Asla Bozulmamalı
 - Standart MantisBT komutları (durum değiştir, atama, sorun güncelle vs.) her zaman çalışmalı

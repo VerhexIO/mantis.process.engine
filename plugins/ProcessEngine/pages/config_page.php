@@ -18,6 +18,7 @@ $t_sla_warning_percent  = plugin_config_get( 'sla_warning_percent' );
 $t_business_hours_start = plugin_config_get( 'business_hours_start' );
 $t_business_hours_end   = plugin_config_get( 'business_hours_end' );
 $t_working_days         = plugin_config_get( 'working_days' );
+$t_departments          = plugin_config_get( 'departments', '' );
 
 // Access levels for dropdown
 $t_access_levels = MantisEnum::getAssocArrayIndexedByValues( config_get( 'access_levels_enum_string' ) );
@@ -117,6 +118,19 @@ $t_access_levels = MantisEnum::getAssocArrayIndexedByValues( config_get( 'access
                                 <input type="text" name="working_days" class="input-sm"
                                        value="<?php echo string_attribute( $t_working_days ); ?>"
                                        placeholder="1,2,3,4,5" />
+                            </td>
+                        </tr>
+
+                        <!-- Departments -->
+                        <tr>
+                            <td class="category">
+                                <?php echo plugin_lang_get( 'config_departments' ); ?>
+                                <br /><small><?php echo plugin_lang_get( 'config_departments_help' ); ?></small>
+                            </td>
+                            <td>
+                                <input type="text" name="departments" class="form-control input-sm"
+                                       value="<?php echo string_attribute( $t_departments ); ?>"
+                                       placeholder="Satış, Fiyatlandırma, ArGe, Kalite" />
                             </td>
                         </tr>
                     </table>

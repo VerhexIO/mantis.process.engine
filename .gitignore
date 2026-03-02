@@ -18,6 +18,9 @@ docker/mantis-data/
 # Logs
 *.log
 
+# Screenshots / test artifacts
+*.png
+
 # Dependencies (MantisBT core is in Docker, not in repo)
 vendor/
 node_modules/

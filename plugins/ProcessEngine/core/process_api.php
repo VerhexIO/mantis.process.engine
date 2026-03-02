@@ -381,6 +381,31 @@ function process_get_dashboard_stats() {
 }
 
 /**
+ * Get the list of departments from config + existing step_table entries.
+ *
+ * @return array Sorted array of department names
+ */
+function process_get_departments() {
+    // 1. Yapılandırmadan tanımlı departmanları al
+    $t_config = plugin_config_get( 'departments', '' );
+    $t_depts = array();
+    if( $t_config !== '' ) {
+        $t_depts = array_map( 'trim', explode( ',', $t_config ) );
+        $t_depts = array_filter( $t_depts, function( $v ) { return $v !== ''; } );
+    }
+    // 2. step_table'daki mevcut departmanları da ekle
+    $t_step_table = plugin_table( 'step' );
+    $t_result = db_query( "SELECT DISTINCT department FROM $t_step_table WHERE department != '' ORDER BY department" );
+    while( $t_row = db_fetch_array( $t_result ) ) {
+        if( !in_array( $t_row['department'], $t_depts ) ) {
+            $t_depts[] = $t_row['department'];
+        }
+    }
+    sort( $t_depts );
+    return $t_depts;
+}
+
+/**
  * Get all tracked bugs with their current step info for the dashboard table.
  *
  * @param string $p_filter Filter type: 'all', 'active', 'sla_exceeded', 'completed'
