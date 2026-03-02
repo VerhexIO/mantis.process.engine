@@ -125,3 +125,34 @@ docker exec mantisbt php /var/www/html/scripts/sla_cron.php  # SLA cron çalış
 ## Git
 - **Repo**: https://github.com/VerhexIO/mantis.process.engine.git
 - **Commit mesajları Türkçe yazılmalıdır**
+
+## KRİTİK: MantisBT Çekirdek İşlevleri Asla Bozulmamalı
+- Standart MantisBT komutları (durum değiştir, atama, sorun güncelle vs.) her zaman çalışmalı
+- Plugin hook'ları MantisBT çekirdek fonksiyonlarını **asla bozmamalı**
+
+### MantisBT Event Hook Parametre İmzaları
+EVENT_UPDATE_BUG hook parametreleri dikkatli kullanılmalı:
+
+```
+# bug_update.php'de çağrılış:
+event_signal( 'EVENT_UPDATE_BUG', array( $t_existing_bug, $t_updated_bug ) );
+
+# Plugin callback'te:
+on_bug_update( $p_event, $p_existing_bug, $p_updated_bug )
+  - $p_existing_bug: BugData nesnesi (güncelleme ÖNCESİ)
+  - $p_updated_bug:  BugData nesnesi (güncelleme SONRASI)
+  - Her iki parametre de BugData nesnesidir, tamsayı DEĞİLDİR!
+  - bug_get() veya bug_get_field() ÇAĞIRMAYIN — BugData nesnesinden doğrudan okuyun
+
+# EVENT_REPORT_BUG ise farklıdır:
+event_signal( 'EVENT_REPORT_BUG', array( $this->issue, $t_issue_id ) );
+on_bug_report( $p_event, $p_bug_data, $p_bug_id )
+  - $p_bug_data: BugData nesnesi
+  - $p_bug_id: integer (sorun ID)
+```
+
+### Hook İçinden Asla Çağrılmaması Gerekenler
+- `bug_set_field()` — bug cache'i bozar, "Illegal offset type" hatasına neden olur
+- `bugnote_add()` — bug_clear_cache() çağırarak cache'i bozar
+- `bug_get($non_integer)` — nesne ile çağrıldığında "Illegal offset type" hatası verir
+- Hook içinden handler değiştirmek gerekiyorsa `register_shutdown_function()` ile ertelenmiş SQL UPDATE kullanılmalı

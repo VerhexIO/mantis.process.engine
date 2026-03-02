@@ -234,32 +234,38 @@ class ProcessEnginePlugin extends MantisPlugin {
 
     /**
      * Hook: EVENT_UPDATE_BUG - log status changes and trigger SLA tracking
+     *
+     * MantisBT EVENT_UPDATE_BUG (EVENT_TYPE_EXECUTE) parametreleri:
+     *   event_signal( 'EVENT_UPDATE_BUG', array( $t_existing_bug, $t_updated_bug ) )
+     * Callback: on_bug_update( $p_event, $p_existing_bug, $p_updated_bug )
+     *   - $p_existing_bug: BugData nesnesi (güncelleme öncesi)
+     *   - $p_updated_bug:  BugData nesnesi (güncelleme sonrası)
      */
-    public function on_bug_update( $p_event, $p_bug_data, $p_bug_id ) {
+    public function on_bug_update( $p_event, $p_existing_bug, $p_updated_bug ) {
         require_once( __DIR__ . '/core/process_api.php' );
 
-        $t_old_bug = bug_get( $p_bug_id );
-        $t_new_status = $p_bug_data->status;
-        $t_old_status = $t_old_bug->status;
+        $t_bug_id = (int) $p_existing_bug->id;
+        $t_old_status = (int) $p_existing_bug->status;
+        $t_new_status = (int) $p_updated_bug->status;
 
         if( $t_old_status != $t_new_status ) {
             // Akış dışı geçiş kontrolü
-            $t_project_id = bug_get_field( $p_bug_id, 'project_id' );
+            $t_project_id = (int) $p_existing_bug->project_id;
             $t_flow = process_get_active_flow_for_project( $t_project_id );
             $t_note = '';
             if( $t_flow !== null && !process_transition_exists( $t_flow['id'], $t_old_status, $t_new_status ) ) {
                 $t_note = plugin_lang_get( 'out_of_flow_transition' );
             }
 
-            process_log_status_change( $p_bug_id, $t_old_status, $t_new_status, $t_note );
+            process_log_status_change( $t_bug_id, $t_old_status, $t_new_status, $t_note );
 
             // SLA tracking: complete old step, start new step
             require_once( __DIR__ . '/core/sla_api.php' );
             if( $t_flow !== null ) {
-                sla_complete_tracking( $p_bug_id );
+                sla_complete_tracking( $t_bug_id );
                 $t_step = process_find_step_by_status( $t_flow['id'], $t_new_status );
                 if( $t_step !== null && (int) $t_step['sla_hours'] > 0 ) {
-                    sla_start_tracking( $p_bug_id, (int) $t_step['id'], (int) $t_flow['id'], (int) $t_step['sla_hours'] );
+                    sla_start_tracking( $t_bug_id, (int) $t_step['id'], (int) $t_flow['id'], (int) $t_step['sla_hours'] );
                 }
 
                 // Otomatik sorumlu atama: yeni adımın handler_id'si varsa ata
@@ -271,22 +277,19 @@ class ProcessEnginePlugin extends MantisPlugin {
                     && user_exists( (int) $t_step['handler_id'] )
                 ) {
                     $t_handler_id = (int) $t_step['handler_id'];
-                    $t_target_bug_id = (int) $p_bug_id;
-                    register_shutdown_function( function() use ( $t_target_bug_id, $t_handler_id ) {
-                        if( bug_exists( $t_target_bug_id ) ) {
+                    register_shutdown_function( function() use ( $t_bug_id, $t_handler_id ) {
+                        if( bug_exists( $t_bug_id ) ) {
                             $t_bug_table = db_get_table( 'bug' );
                             db_param_push();
                             db_query(
                                 "UPDATE $t_bug_table SET handler_id = " . db_param() . " WHERE id = " . db_param(),
-                                array( $t_handler_id, $t_target_bug_id )
+                                array( $t_handler_id, $t_bug_id )
                             );
                         }
                     });
                 }
             }
         }
-
-        return $p_bug_data;
     }
 
     /**

@@ -46,22 +46,23 @@ function process_seed_load() {
     );
     $t_flow1_id = db_insert_id( $t_flow_table );
 
-    // Flow 1 Steps
+    // Flow 1 Steps — handler_id: 0 = otomatik atama yok
+    // Format: name, department, mantis_status, sla_hours, step_order, role, position_x, position_y, handler_id
     $t_flow1_steps = array(
-        array( 'Talep Oluşturma',    'Satış',            10, 8,  1, 'reporter',  100, 100 ),
-        array( 'Fiyat Analizi',      'Fiyatlandırma',    20, 16, 2, 'updater',   300, 100 ),
-        array( 'Tedarikçi Kontrolü', 'Satınalma',        30, 24, 3, 'updater',   500, 100 ),
-        array( 'Yönetim Onayı',     'Yönetim',          50, 8,  4, 'manager',   700, 100 ),
-        array( 'Teklif Hazırlama',   'Satış Operasyon',  80, 16, 5, 'updater',   900, 100 ),
+        array( 'Talep Oluşturma',    'Satış',            10, 8,  1, 'reporter',  100, 100, 0 ),
+        array( 'Fiyat Analizi',      'Fiyatlandırma',    20, 16, 2, 'updater',   300, 100, 0 ),
+        array( 'Tedarikçi Kontrolü', 'Satınalma',        30, 24, 3, 'updater',   500, 100, 0 ),
+        array( 'Yönetim Onayı',     'Yönetim',          50, 8,  4, 'manager',   700, 100, 0 ),
+        array( 'Teklif Hazırlama',   'Satış Operasyon',  80, 16, 5, 'updater',   900, 100, 0 ),
     );
 
     $t_flow1_step_ids = array();
     foreach( $t_flow1_steps as $t_step ) {
         db_param_push();
         db_query(
-            "INSERT INTO $t_step_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y)
+            "INSERT INTO $t_step_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y, handler_id)
              VALUES (" . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", "
-             . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
+             . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
             array(
                 $t_flow1_id,
                 $t_step[0], // name
@@ -72,6 +73,7 @@ function process_seed_load() {
                 $t_step[5], // role
                 $t_step[6], // position_x
                 $t_step[7], // position_y
+                $t_step[8], // handler_id
             )
         );
         $t_flow1_step_ids[] = db_insert_id( $t_step_table );
@@ -113,19 +115,19 @@ function process_seed_load() {
 
     // Flow 2 Steps
     $t_flow2_steps = array(
-        array( 'Talep ve Analiz',   'Satış',   10, 24, 1, 'reporter',  100, 100 ),
-        array( 'ArGe Tasarım',      'ArGe',    30, 40, 2, 'developer', 300, 100 ),
-        array( 'Kalite Kontrolü',   'Kalite',  50, 16, 3, 'updater',   500, 100 ),
-        array( 'Üretim Onayı',      'Yönetim', 80, 8,  4, 'manager',   700, 100 ),
+        array( 'Talep ve Analiz',   'Satış',   10, 24, 1, 'reporter',  100, 100, 0 ),
+        array( 'ArGe Tasarım',      'ArGe',    30, 40, 2, 'developer', 300, 100, 0 ),
+        array( 'Kalite Kontrolü',   'Kalite',  50, 16, 3, 'updater',   500, 100, 0 ),
+        array( 'Üretim Onayı',      'Yönetim', 80, 8,  4, 'manager',   700, 100, 0 ),
     );
 
     $t_flow2_step_ids = array();
     foreach( $t_flow2_steps as $t_step ) {
         db_param_push();
         db_query(
-            "INSERT INTO $t_step_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y)
+            "INSERT INTO $t_step_table (flow_id, name, department, mantis_status, sla_hours, step_order, role, position_x, position_y, handler_id)
              VALUES (" . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", "
-             . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
+             . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ", " . db_param() . ")",
             array(
                 $t_flow2_id,
                 $t_step[0],
@@ -136,6 +138,7 @@ function process_seed_load() {
                 $t_step[5],
                 $t_step[6],
                 $t_step[7],
+                $t_step[8],
             )
         );
         $t_flow2_step_ids[] = db_insert_id( $t_step_table );
